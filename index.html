@@ -1,48 +1,168 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="node_modules/phaser/dist/phaser-arcade-physics.js"></script>
+    <script src="/Server/node_modules/phaser/dist/phaser-arcade-physics.js"></script>
+    <script src="/Server/node_modules/phaser/dist/phaser.js"></script>
 </head>
 <body>
 
     <script>
-    class Main extends Phaser.Scene
-    {
-        preload ()
+
+    
+    var platforms, player, enemy, cam, background, grounds;
+    var cursors;
+
+
+        class Main extends Phaser.Scene
         {
-            this.load.image('sky', 'Assets/Media/Finished/sky.png');
-            this.load.image('ground', 'Assets/Media/Finished/platform.png');
-            this.load.image('star', 'Assets/Media/Finished/star.png');
-            this.load.image('bomb', 'Assets/Media/Finished/bomb.png');
-            this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
-        }
-
-        create ()
-        {
-            this.add.image(400, 300, 'sky');
-        }
-
-        update () 
-        {
-
-        }
-    }
-
-    const config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        scene: Main,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 300 },
-                debug: false
+            preload ()
+            {
+                this.load.image('sky', 'Assets/Media/Finished/sky.png');
+                this.load.image('ground', 'Assets/Media/Finished/platform.png');
+                this.load.image('star', 'Assets/Media/Finished/star.png');
+                this.load.image('bomb', 'Assets/Media/Finished/bomb.png');
+                this.load.image('shadow', 'Assets/Media/Finished/Shadow.png');
+                this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
             }
-        },
-    };
 
-    const game = new Phaser.Game(config);
+            create ()
+            {
+
+                //Camera
+                cam = this.cameras.main;
+                cam.setBounds(0,0,2140, 1070);
+
+                //Enviorment
+                background = this.add.tileSprite(400,300,cam.width,cam.height, 'sky');
+                background.setScrollFactor(0); //keeps moving with the camera
+
+                //Platforms
+                platforms = this.physics.add.staticGroup();
+                platforms.create(400,1000, 'ground');
+                platforms.create(800,900, 'ground');
+
+                //Ground
+                grounds = this.physics.add.staticGroup();
+                grounds.create(1000,1070, 'ground').setScale(6,1).refreshBody();
+
+                //Player
+                player = this.physics.add.sprite(0, 1000, 'dude');
+                player.setCollideWorldBounds(true);
+
+                //Enemy
+                enemy = this.physics.add.sprite(300,600, 'shadow');
+                enemy.setCollideWorldBounds(true);
+
+                //Physics
+                this.physics.world.setBounds(0,0,2140, 1070);
+                this.physics.add.collider(player, platforms, this.onPlayerPlatformCollision);
+                this.physics.add.collider(enemy, platforms, this.onEnemyPlatformCollision);
+                
+                this.physics.add.collider(player, grounds);
+                this.physics.add.collider(enemy, grounds);
+                
+                //Animations
+                this.setUpAnimations();
+
+                //Keyboard keys
+                cursors = this.setUpKeyboardControls();
+
+                //Camera movement
+                cam.startFollow(player);
+            }
+
+            update () 
+            {
+                //Movement
+                if (cursors.left.isDown)
+                {
+                    player.setVelocityX(-160);
+                    player.anims.play('left', true);
+                }
+                else if (cursors.right.isDown)
+                {
+                    player.setVelocityX(160);
+
+                    player.anims.play('right', true);
+                }
+                else
+                {
+                    player.setVelocityX(0);
+
+                    player.anims.play('turn');
+                }
+
+                if (cursors.up.isDown && player.body.touching.down)
+                {
+                    player.setVelocityY(-360);
+                }
+
+                //Background movement with the player
+                background.tilePositionX = cam.scrollX;
+                background.tilePositionY = cam.scrollY;
+            }
+
+            setUpKeyboardControls() {
+                var cursors = this.input.keyboard.addKeys({
+                    'left': Phaser.Input.Keyboard.KeyCodes.A,
+                    'up': Phaser.Input.Keyboard.KeyCodes.W,
+                    'right': Phaser.Input.Keyboard.KeyCodes.D,
+                    'down': Phaser.Input.Keyboard.KeyCodes.S,
+                });
+                return cursors;
+            }
+
+            setUpAnimations() {
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'turn',
+                    frames: [ { key: 'dude', frame: 4 } ],
+                    frameRate: 20
+                });
+
+                this.anims.create( {
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('dude', {start:5, end:8}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+            }
+
+            onEnemyPlatformCollision(enemy, platforms) {
+                //console.log(platforms);
+            }
+
+            onPlayerPlatformCollision(player, platforms) {
+                if(player.body.position.y > platforms.body.position.y) {
+
+                }else{
+
+                }
+            }
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            scene: Main,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: true
+                }
+            },
+        };
+
+        const game = new Phaser.Game(config);
+    
     </script>
 
 </body>
