@@ -6,15 +6,26 @@
 </head>
 <body>
 
-    <script>
+    <script type="module">
 
-    
-    var platforms, player, enemy, cam, background, grounds;
-    var cursors;
+        import Enemy from '/Scripts/Enemy.js';
+        import * as Setup from '/Scripts/Setup.js';
 
+        var platforms, player, cam, background, grounds,cursors;
 
         class Main extends Phaser.Scene
         {
+
+            static BOUNDS_X = 2140;
+            static BOUNDS_Y = 1070;
+
+            constructor() {
+                super();
+                this.isGameOver = false;
+                this.enemiesGroup = null;
+                this.wand = null;
+                this.spells = null;
+            }
             preload ()
             {
                 this.load.image('sky', 'Assets/Media/Finished/sky.png');
@@ -22,24 +33,24 @@
                 this.load.image('star', 'Assets/Media/Finished/star.png');
                 this.load.image('bomb', 'Assets/Media/Finished/bomb.png');
                 this.load.image('shadow', 'Assets/Media/Finished/Shadow.png');
+                this.load.image('flying-shadow', 'Assets/Media/Finished/FlyingShadow.png');
+                this.load.image('wand', 'Assets/Media/Finished/wand.png');
+                this.load.image('fire', 'Assets/Media/Finished/fire.png');
                 this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
             }
 
             create ()
             {
-
                 //Camera
                 cam = this.cameras.main;
-                cam.setBounds(0,0,2140, 1070);
+                cam.setBounds(0,0,Main.BOUNDS_X, Main.BOUNDS_Y);
 
                 //Enviorment
                 background = this.add.tileSprite(400,300,cam.width,cam.height, 'sky');
                 background.setScrollFactor(0); //keeps moving with the camera
 
                 //Platforms
-                platforms = this.physics.add.staticGroup();
-                platforms.create(400,1000, 'ground');
-                platforms.create(800,900, 'ground');
+                platforms = Setup.setUpPlatforms(this);
 
                 //Ground
                 grounds = this.physics.add.staticGroup();
@@ -49,23 +60,50 @@
                 player = this.physics.add.sprite(0, 1000, 'dude');
                 player.setCollideWorldBounds(true);
 
+                //Wand
+                this.wand = this.physics.add.sprite(player.x, player.y, 'wand');
+                this.wand.body.setAllowGravity(false);
+
+                //Shooting spell
+                this.time.addEvent({
+                    delay: 2000,
+                    callback:this.shootSpell,
+                    callbackScope: this,
+                    loop:true,
+                })
+
+                //Spells
+                this.spells = this.physics.add.group({
+                    defaultKey: 'fire'
+                })
+
                 //Enemy
-                enemy = this.physics.add.sprite(300,600, 'shadow');
-                enemy.setCollideWorldBounds(true);
+                // Create a group for enemies
+                this.enemiesGroup = this.physics.add.group();
+                // Spawn enemies
+                for (let i = 0; i < 5; i++) {
+                    let enemy = new Enemy(this, Phaser.Math.Between(100, 700), 0, 'flying-shadow');
+                    this.enemiesGroup.add(enemy);
+                }
 
                 //Physics
-                this.physics.world.setBounds(0,0,2140, 1070);
-                this.physics.add.collider(player, platforms, this.onPlayerPlatformCollision);
-                this.physics.add.collider(enemy, platforms, this.onEnemyPlatformCollision);
-                
+                this.physics.world.setBounds(0,0,Main.BOUNDS_X, Main.BOUNDS_Y);
+                //Collision with platforms
+                this.physics.add.collider(player, platforms);
+                this.physics.add.collider(this.enemiesGroup, platforms);
+                //Collision with ground
                 this.physics.add.collider(player, grounds);
-                this.physics.add.collider(enemy, grounds);
+                this.physics.add.collider(this.enemiesGroup, grounds);
+                //Player-Enemy collision
+                this.physics.add.collider(player,this.enemiesGroup, this.gameOver, null, this);
+                //Spell-Enemy collision
+                this.physics.add.collider(this.spells, this.enemiesGroup, this.killEnemy, null, this);
                 
                 //Animations
-                this.setUpAnimations();
+                Setup.setUpAnimations(this);
 
                 //Keyboard keys
-                cursors = this.setUpKeyboardControls();
+                cursors = Setup.setUpKeyboardControls(this);
 
                 //Camera movement
                 cam.startFollow(player);
@@ -73,6 +111,11 @@
 
             update () 
             {
+                //Game over
+                if(this.isGameOver == true) {
+                    return;
+                }
+
                 //Movement
                 if (cursors.left.isDown)
                 {
@@ -82,13 +125,11 @@
                 else if (cursors.right.isDown)
                 {
                     player.setVelocityX(160);
-
                     player.anims.play('right', true);
                 }
                 else
                 {
                     player.setVelocityX(0);
-
                     player.anims.play('turn');
                 }
 
@@ -97,53 +138,55 @@
                     player.setVelocityY(-360);
                 }
 
+                this.enemiesGroup.getChildren().forEach((enemy, index) => {
+                    // Enemy follows the player
+                    this.physics.moveToObject(enemy, player, 100);
+                });
+
+                //Wand sticks to player
+                this.wand.setPosition(player.x, player.y);
+                // Capture mouse position
+                let pointer = this.input.activePointer;
+                let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
+                // Rotate the wand towards the mouse
+                this.wand.rotation = angle;
+
+                //Remove spells from world if out of bounds
+                this.spells.getChildren().forEach((spell, index) => {
+                    if (spell.x < 0 || spell.x > Main.BOUNDS_X || spell.y < 0 || spell.y > Main.BOUNDS_Y) {
+                        //Destroy the bullet
+                        spell.destroy();
+                    }
+                })
+
                 //Background movement with the player
                 background.tilePositionX = cam.scrollX;
                 background.tilePositionY = cam.scrollY;
             }
 
-            setUpKeyboardControls() {
-                var cursors = this.input.keyboard.addKeys({
-                    'left': Phaser.Input.Keyboard.KeyCodes.A,
-                    'up': Phaser.Input.Keyboard.KeyCodes.W,
-                    'right': Phaser.Input.Keyboard.KeyCodes.D,
-                    'down': Phaser.Input.Keyboard.KeyCodes.S,
-                });
-                return cursors;
+            gameOver() {
+                this.isGameOver = true;
             }
 
-            setUpAnimations() {
-                this.anims.create({
-                    key: 'left',
-                    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-                    frameRate: 10,
-                    repeat: -1
-                });
+            shootSpell() {
+                let pointer = this.input.activePointer;
+                let spell = this.spells.get(this.wand.x, this.wand.y);
+                if(spell) {
+                    spell.setActive = true;
+                    spell.setVisible = true;
+                    //spell.body.setAllowGravity(false);
+                    spell.body.velocity.setTo(0,0);
 
-                this.anims.create({
-                    key: 'turn',
-                    frames: [ { key: 'dude', frame: 4 } ],
-                    frameRate: 20
-                });
+                    let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
 
-                this.anims.create( {
-                    key: 'right',
-                    frames: this.anims.generateFrameNumbers('dude', {start:5, end:8}),
-                    frameRate: 10,
-                    repeat: -1
-                });
-            }
-
-            onEnemyPlatformCollision(enemy, platforms) {
-                //console.log(platforms);
-            }
-
-            onPlayerPlatformCollision(player, platforms) {
-                if(player.body.position.y > platforms.body.position.y) {
-
-                }else{
-
+                    this.physics.velocityFromRotation(angle, 500, spell.body.velocity);
+                    spell.rotation = angle;
                 }
+            }
+
+            killEnemy(spell, enemy) {
+                spell.destroy();
+                enemy.destroy();
             }
         }
 
@@ -156,7 +199,7 @@
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 300 },
-                    debug: true
+                    debug: false
                 }
             },
         };
