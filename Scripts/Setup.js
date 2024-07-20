@@ -47,3 +47,13 @@ export function setUpPlatforms(scene) {
 
     return platforms;
 }
+
+export function setUpUI(scene) {
+    for(let holder in scene.spellHolders) {
+        let x = scene.spellHolders[holder].x;
+        let y = scene.spellHolders[holder].y;
+        var sh = scene.add.image(x, y, 'spell-holder').setScale(3);
+        sh.setDepth(1);
+        sh.setScrollFactor(0);
+    }
+}
