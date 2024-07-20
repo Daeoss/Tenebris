@@ -3,11 +3,13 @@ import Enemy from "./Enemy.js";
 export function calculateDamage(enemy, scene) {
     let matches = 0;
     let armorTypesTemp = [...enemy.armorTypes]; //Create a copy of the enemy's armor types
-    scene.spellsStorage.forEach((spell, i) => { //Loop over the selected spells
-        if(armorTypesTemp.includes(spell.name)) {
+    scene.spellsStorage.forEach((spell, i) => { // Loop over the selected spells
+        // Find the index of the spell name in the armorTypesTemp array
+        let index = armorTypesTemp.findIndex(armor => armor.name === spell.name);
+
+        if (index !== -1) {
             matches++;
-            var index = armorTypesTemp.indexOf(spell.name);
-            armorTypesTemp.splice(index, 1); //Delete the current type of armor from the temporary array in order to avoid reiterating over it and adding additional damage
+            armorTypesTemp.splice(index, 1); // Delete the matched armor type from the temporary array
         }
     });
     return matches;
@@ -41,7 +43,7 @@ export function spawnEnemy() {
     }
 
     let enemy = new Enemy(this, x, y, 'flying-shadow');
-    //addArmorIndicators(enemy.armorTypes);
+    addArmorIndicators(this, enemy.armorTypes, enemy);
     this.enemiesGroup.add(enemy);
 }
 
@@ -49,7 +51,15 @@ export function killEnemy(spell, enemy) {
     let damage = calculateDamage(enemy, this);
     enemy.health -= damage;
     if(enemy.health <= 0) {
+        //Remove the armor UI
+        if (enemy.armorIndicators) {
+            enemy.armorIndicators.forEach((indicator) => {
+                indicator.destroy();
+            });
+        }
+        //Kill the enemy
         enemy.destroy();
+        //Set score
         this.score++;
         this.scoreText.setText('Score: ' + this.score);    
     }
@@ -60,20 +70,25 @@ export function aiMovement(scene, player) {
     scene.enemiesGroup.getChildren().forEach((enemy) => {
         // Enemy follows the player
         scene.physics.moveToObject(enemy, player, 100);
+
+        if (enemy.armorIndicators) {
+            let offset = -20;
+            enemy.armorIndicators.forEach((indicator) => {
+                indicator.setPosition(enemy.x + offset, enemy.y - 30);
+                offset += 20;
+            });
+        }
     });
 }
 
-export function addArmorIndicators(armorTypes) {
+export function addArmorIndicators(scene, armorTypes, enemy) {
+    enemy.armorIndicators = [];
     armorTypes.forEach((type, i) => {
-        if(!spell.image) {
-            spell.image = scene.add.image(0,0,spell.imageName);
-            spell.image.setScrollFactor(0);
-            spell.image.setDepth(0);
+        if(!type.image) {
+            type.image = scene.add.image(0,1000,type.imageName);
         }
 
-        spell.image.x = slot.x;
-        spell.image.y = slot.y;
-        spell.image.setVisible(true);
-        spell.image.setScale(3);
+        // type.image.setPosition(enemy.x + offset, enemy.y - 50);
+        enemy.armorIndicators.push(type.image);
     });
 }
