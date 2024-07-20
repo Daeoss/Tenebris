@@ -9,30 +9,34 @@
     <script type="module">
 
         import Enemy from '/Scripts/Enemy.js';
+        import Player from '/Scripts/Player.js';
         import * as Setup from '/Scripts/Setup.js';
+        import * as EnemyManager from '/Scripts/EnemyManager.js';
+        import * as SpellManager from '/Scripts/SpellManager.js';
 
-        var platforms, player, cam, background, grounds,cursors;
+        var platforms, cam, background, grounds,cursors;
 
         class Main extends Phaser.Scene
         {
-
             static BOUNDS_X = 2140;
             static BOUNDS_Y = 1070;
 
             constructor() {
                 super();
-                this.isGameOver = false;
+                this.score = 0;
+                this.player = null;
                 this.enemiesGroup = null;
                 this.wand = null;
                 this.spells = null;
+                this.scoreText = null;
+                this.isGameOver = false;
                 this.spellsStorage = [];
                 this.spellHolders = {
                     holder1: {x:325,y:50}, 
                     holder2: {x:400,y:50},
                     holder3: {x:475,y:50},
                 };
-                this.fireUI = null;
-                this.waterUI = null;
+                
             }
             preload ()
             {
@@ -68,18 +72,17 @@
                 grounds.create(1000,1070, 'ground').setScale(6,1).refreshBody();
 
                 //Player
-                player = this.physics.add.sprite(0, 1000, 'dude');
-                player.setCollideWorldBounds(true);
+                this.player = new Player(this, 0, 1000, 'dude')
 
                 //Wand
-                this.wand = this.physics.add.sprite(player.x, player.y, 'wand');
+                this.wand = this.physics.add.sprite(this.player.x, this.player.y, 'wand');
                 this.wand.setOrigin(0.5,1);
                 this.wand.body.setAllowGravity(false);
 
                 //Shooting spell
                 this.time.addEvent({
                     delay: 2000,
-                    callback:this.shootSpell,
+                    callback: SpellManager.shootSpell,
                     callbackScope: this,
                     loop:true,
                 })
@@ -95,23 +98,16 @@
                 // Spawn enemies
                 this.time.addEvent({
                     delay: 1000,
-                    callback:this.spawnEnemy,
+                    callback: EnemyManager.spawnEnemy,
                     callbackScope: this,
                     loop:true,
                 })
 
                 //Physics
                 this.physics.world.setBounds(0,0,Main.BOUNDS_X, Main.BOUNDS_Y);
+
                 //Collision with platforms
-                this.physics.add.collider(player, platforms);
-                this.physics.add.collider(this.enemiesGroup, platforms);
-                //Collision with ground
-                this.physics.add.collider(player, grounds);
-                //this.physics.add.collider(this.enemiesGroup, grounds);
-                //Player-Enemy collision
-                this.physics.add.collider(player,this.enemiesGroup, this.gameOver, null, this);
-                //Spell-Enemy collision
-                this.physics.add.collider(this.spells, this.enemiesGroup, this.killEnemy, null, this);
+                this.addColliders();
                 
                 //Animations
                 Setup.setUpAnimations(this);
@@ -120,7 +116,7 @@
                 cursors = Setup.setUpKeyboardControls(this);
 
                 //Camera movement
-                cam.startFollow(player);
+                cam.startFollow(this.player);
 
                 /************
                 * IMPORTANT
@@ -128,15 +124,10 @@
                 * The on screen UI needs to be the last one
                 */
 
-                for(let holder in this.spellHolders) {
-                    let x = this.spellHolders[holder].x;
-                    let y = this.spellHolders[holder].y;
-                    var sh = this.add.image(x, y, 'spell-holder').setScale(3);
-                    sh.setDepth(1);
-                    sh.setScrollFactor(0);
-                }
+                Setup.setUpUI(this);
 
-
+                this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '32px', fill: '#000' });
+                this.scoreText.setScrollFactor(0);
             }
 
             update () 
@@ -147,84 +138,28 @@
                 }
 
                 //Movement
-                if (cursors.left.isDown)
-                {
-                    player.setVelocityX(-160);
-                    player.anims.play('left', true);
-                }
-                else if (cursors.right.isDown)
-                {
-                    player.setVelocityX(160);
-                    player.anims.play('right', true);
-                }
-                else
-                {
-                    player.setVelocityX(0);
-                    player.anims.play('turn');
-                }
+                this.player.Movement(cursors, 160);
 
-                if (cursors.up.isDown && player.body.touching.down)
-                {
-                    player.setVelocityY(-360);
-                }
-
-                this.enemiesGroup.getChildren().forEach((enemy, index) => {
-                    // Enemy follows the player
-                    this.physics.moveToObject(enemy, player, 100);
-                });
+                //Enemy movement
+                EnemyManager.aiMovement(this, this.player);
 
                 //Spell selection
                 if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
-                    if(this.spellsStorage.length >= 3) {
-                        var lastSpell = this.spellsStorage.pop();
-                        if(lastSpell.image) {
-                            lastSpell.image.destroy();
-                        }
-                    }
-                    //Add element to array
-                    this.spellsStorage.unshift({
-                        name: 'fire',
-                        imageName: 'fireUI'
-                    });
-
-                    this.addSpellImageToUI();
-
+                    SpellManager.addSpellToSlot(this, 'fire', 'fireUI');
                     console.log(this.spellsStorage);
                 }
 
                 if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
-                    if(this.spellsStorage.length >= 3) {
-                        var lastSpell = this.spellsStorage.pop();
-                        if(lastSpell.image) {
-                            lastSpell.image.destroy();
-                        }
-                    }
-                    //Add element to array
-                    this.spellsStorage.unshift({
-                        name: 'water',
-                        imageName: 'waterUI'
-                    });
-                    this.addSpellImageToUI();
-
+                    SpellManager.addSpellToSlot(this, 'water', 'waterUI');
                     console.log(this.spellsStorage);
                 }
 
                 //Wand sticks to player
-                this.wand.setPosition(player.x, player.y);
-                // Capture mouse position
-                let pointer = this.input.activePointer;
-                let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
-                // Rotate the wand towards the mouse
-                this.wand.rotation = angle;
-
+                this.player.AttachWandToPlayerAndRotate(this);
+                
                 //Remove spells from world if out of bounds
-                this.spells.getChildren().forEach((spell, index) => {
-                    if (spell.x < 0 || spell.x > Main.BOUNDS_X || spell.y < 0 || spell.y > Main.BOUNDS_Y) {
-                        //Destroy the bullet
-                        spell.destroy();
-                    }
-                })
-
+                SpellManager.removeSpellIfOutOfBounds(this, Main.BOUNDS_X, Main.BOUNDS_Y);
+                
                 //Background movement with the player
                 background.tilePositionX = cam.scrollX;
                 background.tilePositionY = cam.scrollY;
@@ -234,100 +169,19 @@
                 this.isGameOver = true;
             }
 
-            shootSpell() {
-                let pointer = this.input.activePointer;
-                let spell = this.spells.get(this.wand.x, this.wand.y-this.wand.height);
-                if(spell) {
-                    //spell.body.setAllowGravity(false);
-                    spell.body.velocity.setTo(0,0);
+            addColliders() {
+                this.physics.add.collider(this.player, platforms);
+                this.physics.add.collider(this.enemiesGroup, platforms);
 
-                    let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
+                //Collision with ground
+                this.physics.add.collider(this.player, grounds);
+                //this.physics.add.collider(this.enemiesGroup, grounds);
 
-                    this.physics.velocityFromRotation(angle, 500, spell.body.velocity);
-                    spell.rotation = angle;
-                }
-            }
+                //Player-Enemy collision
+                this.physics.add.collider(this.player,this.enemiesGroup, this.gameOver, null, this);
 
-            killEnemy(spell, enemy) {
-
-                let damage = this.calculateDamage(enemy);
-                enemy.health -= damage;
-                if(enemy.health <= 0) {
-                    enemy.destroy();
-                }
-                spell.destroy();
-            }
-
-            calculateDamage(enemy) {
-                let matches = 0;
-                let armorTypesTemp = [...enemy.armorTypes]; //Create a copy of the enemy's armor types
-                this.spellsStorage.forEach((spell, i) => { //Loop over the selected spells
-                    if(armorTypesTemp.includes(spell.name)) {
-                        matches++;
-                        var index = armorTypesTemp.indexOf(spell.name);
-                        armorTypesTemp.splice(index, 1); //Delete the current type of armor from the temporary array in order to avoid reiterating over it and adding additional damage
-                    }
-                });
-                return matches;
-            }
-
-            spawnEnemy() {
-                const spawnSide = Phaser.Math.Between(0,3);
-                let worldWidth = this.physics.world.bounds.width;
-                let worldHeight = this.physics.world.bounds.height;
-                let x,y;
-
-                switch(spawnSide) {
-                    case 0: // top
-                        x = Phaser.Math.Between(0,worldWidth);
-                        y = -50;
-                        break;
-                    case 1: //right
-                        x = worldWidth + 50;
-                        y = Phaser.Math.Between(0, worldHeight);
-                        break;
-                    case 2: //bottom
-                        x = Phaser.Math.Between(0, worldWidth);
-                        y = worldHeight + 50;
-                        break;
-                    case 3: //left
-                        x = -50;
-                        y = Phaser.Math.Between(0, worldHeight);
-                        break;
-                    default:
-                        break;
-                }
-
-                let enemy = new Enemy(this, x, y, 'flying-shadow');
-                this.enemiesGroup.add(enemy);
-            }
-
-            addSpellImageToUI() {
-                var slot;
-                this.spellsStorage.forEach((spell, i) => {
-                    if(!spell.image) {
-                        spell.image = this.add.image(0,0,spell.imageName);
-                        spell.image.setScrollFactor(0);
-                        spell.image.setDepth(0);
-                    }
-                    
-                    switch(i){
-                        case 0:
-                            slot = this.spellHolders['holder1'];
-                            break;
-                        case 1:
-                            slot = this.spellHolders['holder2'];
-                            break;
-                        case 2:
-                            slot = this.spellHolders['holder3'];
-                            break;
-                    }
-
-                    spell.image.x = slot.x;
-                    spell.image.y = slot.y;
-                    spell.image.setVisible(true);
-                    spell.image.setScale(3);
-                });
+                //Spell-Enemy collision
+                this.physics.add.collider(this.spells, this.enemiesGroup, EnemyManager.killEnemy, null, this);
             }
         }
 
