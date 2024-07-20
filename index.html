@@ -25,6 +25,14 @@
                 this.enemiesGroup = null;
                 this.wand = null;
                 this.spells = null;
+                this.spellsStorage = [];
+                this.spellHolders = {
+                    holder1: {x:325,y:50}, 
+                    holder2: {x:400,y:50},
+                    holder3: {x:475,y:50},
+                };
+                this.fireUI = null;
+                this.waterUI = null;
             }
             preload ()
             {
@@ -36,6 +44,9 @@
                 this.load.image('flying-shadow', 'Assets/Media/Finished/FlyingShadow.png');
                 this.load.image('wand', 'Assets/Media/Finished/wand.png');
                 this.load.image('fire', 'Assets/Media/Finished/fire.png');
+                this.load.image('fireUI', 'Assets/Media/Finished/fireUI.png');
+                this.load.image('waterUI', 'Assets/Media/Finished/waterUI.png');
+                this.load.image('spell-holder', 'Assets/Media/Finished/spell-holder.png');
                 this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
             }
 
@@ -62,6 +73,7 @@
 
                 //Wand
                 this.wand = this.physics.add.sprite(player.x, player.y, 'wand');
+                this.wand.setOrigin(0.5,1);
                 this.wand.body.setAllowGravity(false);
 
                 //Shooting spell
@@ -81,10 +93,12 @@
                 // Create a group for enemies
                 this.enemiesGroup = this.physics.add.group();
                 // Spawn enemies
-                for (let i = 0; i < 5; i++) {
-                    let enemy = new Enemy(this, Phaser.Math.Between(100, 700), 0, 'flying-shadow');
-                    this.enemiesGroup.add(enemy);
-                }
+                this.time.addEvent({
+                    delay: 1000,
+                    callback:this.spawnEnemy,
+                    callbackScope: this,
+                    loop:true,
+                })
 
                 //Physics
                 this.physics.world.setBounds(0,0,Main.BOUNDS_X, Main.BOUNDS_Y);
@@ -93,7 +107,7 @@
                 this.physics.add.collider(this.enemiesGroup, platforms);
                 //Collision with ground
                 this.physics.add.collider(player, grounds);
-                this.physics.add.collider(this.enemiesGroup, grounds);
+                //this.physics.add.collider(this.enemiesGroup, grounds);
                 //Player-Enemy collision
                 this.physics.add.collider(player,this.enemiesGroup, this.gameOver, null, this);
                 //Spell-Enemy collision
@@ -107,6 +121,29 @@
 
                 //Camera movement
                 cam.startFollow(player);
+
+                /************
+                * IMPORTANT
+                * 
+                * The on screen UI needs to be the last one
+                */
+
+                this.fireUI = this.add.image(0,0,'fireUI');
+                this.fireUI.setVisible(false);
+                this.fireUI.setScrollFactor(0);
+
+                this.waterUI = this.add.image(0,0,'waterUI');
+                this.waterUI.setVisible(false);
+                this.waterUI.setScrollFactor(0);
+
+                for(let holder in this.spellHolders) {
+                    let x = this.spellHolders[holder].x;
+                    let y = this.spellHolders[holder].y;
+                    var sh = this.add.image(x, y, 'spell-holder').setScale(3);
+                    sh.setScrollFactor(0);
+                }
+
+
             }
 
             update () 
@@ -143,6 +180,52 @@
                     this.physics.moveToObject(enemy, player, 100);
                 });
 
+                //Spell selection
+                if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
+                    if(this.spellsStorage.length >= 3) {
+                        this.spellsStorage.pop();
+                    }
+                    this.spellsStorage.unshift('fire');
+
+                    //Daca e primul spell, atunci ocupam primul slot
+                    // var slot;
+                    // this.spellsStorage.forEach((spell, i) => {
+                    //     switch(i){
+                    //         case 0:
+                    //             slot = this.spellHolders['holder1'];
+                    //             if(spell == 'fire') {
+                    //                 this.fireUI.x = slot.x;
+                    //                 this.fireUI.y = slot.y;
+                    //                 this.fireUI.setVisible(true);
+                    //                 this.fireUI.setScale(3);
+                    //             }
+                    //             break;
+                    //         case 1:
+                    //             slot = this.spellHolders['holder2'];
+                    //             if(spell == 'fire') {
+                    //                 this.fireUI.x = slot.x;
+                    //                 this.fireUI.y = slot.y;
+                    //                 this.fireUI.setVisible(true);
+                    //                 this.fireUI.setScale(3);
+                    //             }
+                    //             break;
+                    //         case 2:
+                    //             break;
+                    //     }
+                    // });
+                    //Daca e al doilea spell atunci mutam primul slot pe al doilea, si il ocupam pe primul
+
+                    console.log(this.spellsStorage);
+                }
+
+                if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
+                    if(this.spellsStorage.length >= 3) {
+                        this.spellsStorage.pop();
+                    }
+                    this.spellsStorage.unshift('water');
+                    console.log(this.spellsStorage);
+                }
+
                 //Wand sticks to player
                 this.wand.setPosition(player.x, player.y);
                 // Capture mouse position
@@ -170,10 +253,8 @@
 
             shootSpell() {
                 let pointer = this.input.activePointer;
-                let spell = this.spells.get(this.wand.x, this.wand.y);
+                let spell = this.spells.get(this.wand.x, this.wand.y-this.wand.height);
                 if(spell) {
-                    spell.setActive = true;
-                    spell.setVisible = true;
                     //spell.body.setAllowGravity(false);
                     spell.body.velocity.setTo(0,0);
 
@@ -185,8 +266,57 @@
             }
 
             killEnemy(spell, enemy) {
+
+                let damage = this.calculateDamage(enemy);
+                enemy.health -= damage;
+                if(enemy.health <= 0) {
+                    enemy.destroy();
+                }
                 spell.destroy();
-                enemy.destroy();
+            }
+
+            calculateDamage(enemy) {
+                let matches = 0;
+                let armorTypesTemp = [...enemy.armorTypes]; //Create a copy of the enemy's armor types
+                this.spellsStorage.forEach((spell, i) => { //Loop over the selected spells
+                    if(armorTypesTemp.includes(this.spellsStorage[i])) {
+                        matches++;
+                        var index = armorTypesTemp.indexOf(this.spellsStorage[i]);
+                        armorTypesTemp.splice(index, 1); //Delete the current type of armor from the temporary array in order to avoid reiterating over it and adding additional damage
+                    }
+                });
+                return matches;
+            }
+
+            spawnEnemy() {
+                const spawnSide = Phaser.Math.Between(0,3);
+                let worldWidth = this.physics.world.bounds.width;
+                let worldHeight = this.physics.world.bounds.height;
+                let x,y;
+
+                switch(spawnSide) {
+                    case 0: // top
+                        x = Phaser.Math.Between(0,worldWidth);
+                        y = -50;
+                        break;
+                    case 1: //right
+                        x = worldWidth + 50;
+                        y = Phaser.Math.Between(0, worldHeight);
+                        break;
+                    case 2: //bottom
+                        x = Phaser.Math.Between(0, worldWidth);
+                        y = worldHeight + 50;
+                        break;
+                    case 3: //left
+                        x = -50;
+                        y = Phaser.Math.Between(0, worldHeight);
+                        break;
+                    default:
+                        break;
+                }
+
+                let enemy = new Enemy(this, x, y, 'flying-shadow');
+                this.enemiesGroup.add(enemy);
             }
         }
 
@@ -199,7 +329,7 @@
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 300 },
-                    debug: false
+                    debug: true
                 }
             },
         };

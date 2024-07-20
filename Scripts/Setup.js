@@ -4,6 +4,8 @@ export function setUpKeyboardControls(scene) {
         'up': Phaser.Input.Keyboard.KeyCodes.W,
         'right': Phaser.Input.Keyboard.KeyCodes.D,
         'down': Phaser.Input.Keyboard.KeyCodes.S,
+        'firstSpell': Phaser.Input.Keyboard.KeyCodes.Q,
+        'secondSpell': Phaser.Input.Keyboard.KeyCodes.E,
     });
     return cursors;
 }

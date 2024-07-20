@@ -4,9 +4,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
-    }
-
-    move() {
-        console.log(moving);
+        this.armorTypes = ['fire', 'water'];
+        this.health = this.armorTypes.length;
     }
 }
