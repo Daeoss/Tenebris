@@ -50,6 +50,7 @@ export function spawnEnemy() {
 export function killEnemy(spell, enemy) {
     let damage = calculateDamage(enemy, this);
     enemy.health -= damage;
+
     if(enemy.health <= 0) {
         //Remove the armor UI
         if (enemy.armorIndicators) {

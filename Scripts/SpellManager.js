@@ -20,18 +20,8 @@ export function addSpellImageToUI(scene) {
             spell.image.setScrollFactor(0);
             spell.image.setDepth(0);
         }
-        
-        switch(i){
-            case 0:
-                slot = scene.spellHolders['holder1'];
-                break;
-            case 1:
-                slot = scene.spellHolders['holder2'];
-                break;
-            case 2:
-                slot = scene.spellHolders['holder3'];
-                break;
-        }
+
+        slot = scene.spellHolders[i];
 
         spell.image.x = slot.x;
         spell.image.y = slot.y;
