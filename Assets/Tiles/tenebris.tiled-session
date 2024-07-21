@@ -3,29 +3,76 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Ground.tsx",
+    "activeFile": "mainTileset.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Ground.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "mainTileset.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 2188,
+                "y": 832
+            }
+        },
+        "mainTileset.tmx#test_tileset": {
+            "scaleInDock": 1
+        },
+        "test2Tileset.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1164,
+                "y": 586
+            }
+        },
+        "test2Tileset.tmx#test_tileset": {
+            "scaleInDock": 1
+        },
+        "testTileset.tmx": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 137,
+                "y": 91.75
+            }
         }
     },
+    "last.exportedFilePath": "D:/Projects/Games/Tenebris/Assets/Tiles",
     "last.imagePath": "D:/Projects/Games/Tenebris/Assets/Media/Finished",
+    "lastUsedTilesetExportFilter": "All Files (*)",
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "1",
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
     "openFiles": [
-        "Ground.tsx"
+        "mainTileset.tmx"
     ],
     "project": "tenebris.tiled-project",
+    "property.type": "bool",
     "recentFiles": [
+        "mainTileset.tmx",
+        "test2Tileset.tmx",
+        "testTileset.tmx",
         "Ground.tsx"
     ],
+    "resizeMap.removeObjects": true,
     "tileset.embedInMap": true,
-    "tileset.lastUsedFormat": "tsx"
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.spacing": 0,
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
 }

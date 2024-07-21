@@ -14,12 +14,12 @@
         import * as EnemyManager from '/Scripts/EnemyManager.js';
         import * as SpellManager from '/Scripts/SpellManager.js';
 
-        var platforms, cam, background, grounds,cursors;
+        var cam, background, cursors;
 
         class Main extends Phaser.Scene
         {
-            static BOUNDS_X = 2140;
-            static BOUNDS_Y = 1070;
+            static BOUNDS_X = 2560;
+            static BOUNDS_Y = 1440;
 
             constructor() {
                 super();
@@ -29,6 +29,8 @@
                 this.wand = null;
                 this.spells = null;
                 this.scoreText = null;
+                this.grounds = null;
+                this.platforms = null;
                 this.isGameOver = false;
                 this.leftMouseJustDown = false;
                 this.rightMouseJustDown = false;
@@ -58,6 +60,9 @@
                 this.load.image('earthUI', 'Assets/Media/Finished/earthUI.png');
                 this.load.image('spell-holder', 'Assets/Media/Finished/spell-holder.png');
                 this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
+
+                this.load.image("tiles", "Assets/Media/Finished/tileset.png");
+                this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
             }
 
             create ()
@@ -70,15 +75,19 @@
                 background = this.add.tileSprite(400,300,cam.width,cam.height, 'sky');
                 background.setScrollFactor(0); //keeps moving with the camera
 
+                //Tilemap
+                const map = this.make.tilemap({key: 'map'});
+                const tileset = map.addTilesetImage('test_tileset', 'tiles');
+
                 //Platforms
-                platforms = Setup.setUpPlatforms(this);
+                Setup.setUpPlatforms(this, map, tileset);
 
                 //Ground
-                grounds = this.physics.add.staticGroup();
-                grounds.create(1000,1070, 'ground').setScale(6,1).refreshBody();
+                this.grounds = map.createLayer("Ground", tileset, 0, 0);
+                this.grounds.setCollisionByProperty({collides: true});
 
                 //Player
-                this.player = new Player(this, 0, 1000, 'dude')
+                this.player = new Player(this, 0, 1300, 'dude')
 
                 //Wand
                 this.wand = this.physics.add.sprite(this.player.x, this.player.y, 'wand');
@@ -87,7 +96,7 @@
 
                 //Shooting spell
                 this.time.addEvent({
-                    delay: 1000,
+                    delay: 100,
                     callback: SpellManager.shootSpell,
                     callbackScope: this,
                     loop:true,
@@ -203,11 +212,11 @@
             }
 
             addColliders() {
-                this.physics.add.collider(this.player, platforms);
-                this.physics.add.collider(this.enemiesGroup, platforms);
+                this.physics.add.collider(this.player, this.platforms);
+                this.physics.add.collider(this.enemiesGroup, this.platforms);
 
                 //Collision with ground
-                this.physics.add.collider(this.player, grounds);
+                this.physics.add.collider(this.player, this.grounds);
                 //this.physics.add.collider(this.enemiesGroup, grounds);
 
                 //Player-Enemy collision
@@ -223,6 +232,7 @@
             width: 800,
             height: 600,
             scene: Main,
+            pixelArt: true,
             disableContextMenu: true, //Disable right mouse button menu
             physics: {
                 default: 'arcade',
