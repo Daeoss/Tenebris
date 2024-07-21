@@ -41,7 +41,8 @@ export function addSpellImageToUI(scene) {
 }
 
 export function addSpellToSlot(scene, spellName, spellImageName) {
-    if(scene.spellsStorage.length >= 3) {
+    let max_player_spells = 2;
+    if(scene.spellsStorage.length >= max_player_spells) {
         var lastSpell = scene.spellsStorage.pop();
         if(lastSpell.image) {
             lastSpell.image.destroy();
