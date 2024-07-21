@@ -32,20 +32,17 @@ export function setUpAnimations(scene) {
     });
 }
 
-export function setUpPlatforms(scene) {
-    //Platforms
-    var platforms = scene.physics.add.staticGroup();
-    platforms.create(400,900, 'ground');
-    platforms.create(900,700, 'ground');
-
-    //Pass-through platforms
-    platforms.getChildren().forEach((platform, index) => {
-        platform.body.checkCollision.left = false;
-        platform.body.checkCollision.right = false;
-        platform.body.checkCollision.down = false;
+export function setUpPlatforms(scene, map, tileset) {
+    scene.platforms = map.createLayer("Platforms", tileset, 0, 0);
+    scene.platforms.setCollisionByProperty({collides: true});
+    //Pass through platforms
+    scene.platforms.forEachTile((tile) => {
+        if(tile.collides) {
+            tile.collideDown = false;
+            tile.collideLeft = false;
+            tile.collideRight = false;
+        }
     });
-
-    return platforms;
 }
 
 export function setUpUI(scene) {

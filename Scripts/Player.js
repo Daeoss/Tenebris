@@ -4,6 +4,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
+        this.enemiesKilled = 0;
     }
 
     Movement(cursors, speed) {
@@ -22,8 +23,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityX(0);
             this.anims.play('turn');
         }
-
-        if (cursors.up.isDown && this.body.touching.down)
+        if (cursors.up.isDown && this.body.blocked.down)
         {
             this.setVelocityY(-360);
         }
