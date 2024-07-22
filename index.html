@@ -24,6 +24,7 @@
             constructor() {
                 super();
                 this.score = 0;
+                this.currentWaveIndex = 0;
                 this.player = null;
                 this.enemiesGroup = null;
                 this.wand = null;
@@ -42,6 +43,29 @@
                     // holder2: {x:400,y:50},
                     // holder3: {x:475,y:50},
                 };
+                this.waves  = [
+                    {
+                        title:'wave1',
+                        time: 1000,
+                        enemies: [
+                            { type: 'flying', count:20, interval: 200 }
+                        ],
+                    },
+                    {
+                        title:'wave2', 
+                        time: 5000,
+                        enemies: [
+                            { type: 'flying', count:100, interval: 500 }
+                        ],
+                    },
+                    {
+                        title:'wave3', 
+                        time: 25000,
+                        enemies: [
+                            {  type: 'flying', count:500, interval: 100 }
+                        ],
+                    },
+                ]
                 
             }
             preload ()
@@ -110,13 +134,8 @@
                 //Enemy
                 // Create a group for enemies
                 this.enemiesGroup = this.physics.add.group();
-                // Spawn enemies
-                this.time.addEvent({
-                    delay: 1000,
-                    callback: EnemyManager.spawnEnemy,
-                    callbackScope: this,
-                    loop:true,
-                });
+                //Spawn enemies in waves
+                EnemyManager.scheduleNextWave(this);
 
                 //Mouse set-up
                 this.input.on('pointerdown', (pointer) => {
@@ -173,27 +192,27 @@
                 //Fire
                 if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
                     SpellManager.addSpellToSlot(this, 'fire', 'fireUI');
-                    console.log(this.spellsStorage);
+                    // console.log(this.spellsStorage);
                 }
 
                 //Water
                 if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
                     SpellManager.addSpellToSlot(this, 'water', 'waterUI');
-                    console.log(this.spellsStorage);
+                    // console.log(this.spellsStorage);
                 }
 
                 //Air
                 if(this.leftMouseJustDown == true) {
                     SpellManager.addSpellToSlot(this, 'air', 'airUI');
-                    console.log(this.spellsStorage);
-                    this.leftMouseJustDown = false;
+                    this.leftMouseJustDown = false; // Only click for 1 frame
+                    // console.log(this.spellsStorage);
                 }
 
                 //Earth
                 if(this.rightMouseJustDown == true) {
                     SpellManager.addSpellToSlot(this, 'earth', 'earthUI');
-                    console.log(this.spellsStorage);
-                    this.rightMouseJustDown = false;
+                    this.rightMouseJustDown = false; // Only click for 1 frame
+                    // console.log(this.spellsStorage);
                 }
 
                 //Wand sticks to player

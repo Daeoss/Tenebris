@@ -44,7 +44,6 @@ export function spawnEnemy() {
 
     let enemy = new Enemy(this, x, y, 'flying-shadow');
     addArmorIndicators(this, enemy.armorTypes, enemy);
-    this.enemiesGroup.add(enemy);
 }
 
 export function killEnemy(spell, enemy) {
@@ -88,8 +87,29 @@ export function addArmorIndicators(scene, armorTypes, enemy) {
         if(!type.image) {
             type.image = scene.add.image(0,1000,type.imageName);
         }
-
-        // type.image.setPosition(enemy.x + offset, enemy.y - 50);
         enemy.armorIndicators.push(type.image);
+    });
+}
+
+export function scheduleNextWave(scene) {
+    if(scene.currentWaveIndex < scene.waves.length) {
+        let wave = scene.waves[scene.currentWaveIndex];
+        scene.time.delayedCall(wave.time, () => {
+            spawnWave(scene, wave);
+            scene.currentWaveIndex++;
+            scheduleNextWave(scene);
+        });
+    }
+}
+
+export function spawnWave(scene, wave) {
+    wave.enemies.forEach((info) => {
+        for(let i = 0; i<info.count; i++) {
+            scene.time.addEvent({
+                delay: info.interval * i,
+                callback: spawnEnemy,
+                callbackScope: scene,
+            });
+        }
     });
 }
