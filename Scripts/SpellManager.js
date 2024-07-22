@@ -1,15 +1,22 @@
 export function shootSpell() {
-    let pointer = this.input.activePointer;
-    let spell = this.spells.get(this.wand.x, this.wand.y-this.wand.height);
-    if(spell) {
-        //spell.body.setAllowGravity(false);
-        spell.body.velocity.setTo(0,0);
+    //If we want to add a power-up where shooting multiple bullets is possible
+    // for(let i = 0; i < 10; i++) {
+        // let startPlace = Phaser.Math.Between(0,60);
 
-        let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
-
-        this.physics.velocityFromRotation(angle, 500, spell.body.velocity);
-        spell.rotation = angle;
-    }
+        let pointer = this.input.activePointer;
+        let spell = this.spells.get(this.wand.x, this.wand.y-this.wand.height);
+        if(spell) {
+            // spell.body.setAllowGravity(false);
+            spell.body.velocity.setTo(0,0);
+    
+            // let recoil = Phaser.Math.Between(-150,150);
+            let angle = Phaser.Math.Angle.Between(this.wand.x, this.wand.y, pointer.worldX, pointer.worldY);
+    
+            this.physics.velocityFromRotation(angle, 500, spell.body.velocity);
+            spell.rotation = angle;
+        }
+    // }
+    
 }
 
 export function addSpellImageToUI(scene) {

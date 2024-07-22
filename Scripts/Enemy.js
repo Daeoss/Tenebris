@@ -16,6 +16,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.armorTypes = this.pickArmorTypes(this.allArmorTypes);
         //Attributes setup
         this.health = this.armorTypes.length;
+        scene.enemiesGroup.add(this);
     }
 
     pickArmorTypes(armorTypes) {
