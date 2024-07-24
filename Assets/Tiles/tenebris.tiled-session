@@ -19,10 +19,10 @@
         },
         "mainTileset.tmx": {
             "scale": 0.25,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2188,
-                "y": 832
+                "x": 1160,
+                "y": 830
             }
         },
         "mainTileset.tmx#test_tileset": {
@@ -60,7 +60,7 @@
         "mainTileset.tmx"
     ],
     "project": "tenebris.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "mainTileset.tmx",
         "test2Tileset.tmx",

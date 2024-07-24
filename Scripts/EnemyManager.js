@@ -69,7 +69,7 @@ export function killEnemy(spell, enemy) {
 export function aiMovement(scene, player) {
     scene.enemiesGroup.getChildren().forEach((enemy) => {
         // Enemy follows the player
-        scene.physics.moveToObject(enemy, player, 100);
+        scene.physics.moveToObject(enemy, player, enemy.speed);
 
         if (enemy.armorIndicators) {
             let offset = -20;

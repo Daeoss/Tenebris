@@ -10,9 +10,11 @@
         //randomize enemy creation
         import Enemy from '/Scripts/Enemy.js';
         import Player from '/Scripts/Player.js';
+        import PowerUpsManager from '/Scripts/PowerUpsManager.js';
+        import SpellManager from '/Scripts/SpellManager.js';
         import * as Setup from '/Scripts/Setup.js';
         import * as EnemyManager from '/Scripts/EnemyManager.js';
-        import * as SpellManager from '/Scripts/SpellManager.js';
+        import * as PowerUpEffects from '/Scripts/PowerUpEffects.js';
 
         var cam, background, cursors;
 
@@ -25,10 +27,14 @@
                 super();
                 this.score = 0;
                 this.currentWaveIndex = 0;
+
                 this.player = null;
                 this.enemiesGroup = null;
+                this.powerUpsGroup = null;
                 this.wand = null;
                 this.spells = null;
+                this.spellManager = null;
+                this.powerUpsManager = null;
                 this.scoreText = null;
                 this.grounds = null;
                 this.platforms = null;
@@ -48,21 +54,21 @@
                         title:'wave1',
                         time: 1000,
                         enemies: [
-                            { type: 'flying', count:20, interval: 200 }
+                            { type: 'flying', count:100, interval: 200 }
                         ],
                     },
                     {
                         title:'wave2', 
                         time: 5000,
                         enemies: [
-                            { type: 'flying', count:100, interval: 500 }
+                            { type: 'flying', count:1, interval: 500 }
                         ],
                     },
                     {
                         title:'wave3', 
                         time: 25000,
                         enemies: [
-                            {  type: 'flying', count:500, interval: 100 }
+                            {  type: 'flying', count:1, interval: 100 }
                         ],
                     },
                 ]
@@ -83,6 +89,11 @@
                 this.load.image('airUI', 'Assets/Media/Finished/airUI.png');
                 this.load.image('earthUI', 'Assets/Media/Finished/earthUI.png');
                 this.load.image('spell-holder', 'Assets/Media/Finished/spell-holder.png');
+                this.load.image('bullet-icon', 'Assets/Media/Finished/bullet-icon.png');
+                this.load.image('speed-icon', 'Assets/Media/Finished/speed-icon.png');
+                this.load.image('shield-icon', 'Assets/Media/Finished/shield-icon.png');
+                this.load.image('freeze-icon', 'Assets/Media/Finished/freeze-icon.png');
+                this.load.image('player-shield', 'Assets/Media/Finished/player-shield.png');
                 this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
 
                 this.load.image("tiles", "Assets/Media/Finished/tileset.png");
@@ -110,23 +121,23 @@
                 this.grounds = map.createLayer("Ground", tileset, 0, 0);
                 this.grounds.setCollisionByProperty({collides: true});
 
+                //Power-ups
+                this.powerUpsManager = new PowerUpsManager(this);
+                this.powerUpsGroup = this.physics.add.staticGroup();
+                this.powerUpsManager.spawnPowerUps(map);
+                
                 //Player
-                this.player = new Player(this, 0, 1300, 'dude')
+                this.player = new Player(this, 0, 1300, 'dude');
 
                 //Wand
                 this.wand = this.physics.add.sprite(this.player.x, this.player.y, 'wand');
                 this.wand.setOrigin(0.5,1);
                 this.wand.body.setAllowGravity(false);
 
-                //Shooting spell
-                this.time.addEvent({
-                    delay: 100,
-                    callback: SpellManager.shootSpell,
-                    callbackScope: this,
-                    loop:true,
-                })
-
                 //Spells
+                this.spellManager = new SpellManager(this);
+                this.spellManager.startAutoShoot();
+
                 this.spells = this.physics.add.group({
                     defaultKey: 'fire'
                 })
@@ -183,7 +194,7 @@
                 }
 
                 //Movement
-                this.player.Movement(cursors, 160);
+                this.player.Movement(cursors);
 
                 //Enemy movement
                 EnemyManager.aiMovement(this, this.player);
@@ -191,26 +202,26 @@
                 //Spell selection
                 //Fire
                 if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
-                    SpellManager.addSpellToSlot(this, 'fire', 'fireUI');
+                    this.spellManager.addSpellToSlot(this, 'fire', 'fireUI');
                     // console.log(this.spellsStorage);
                 }
 
                 //Water
                 if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
-                    SpellManager.addSpellToSlot(this, 'water', 'waterUI');
+                    this.spellManager.addSpellToSlot(this, 'water', 'waterUI');
                     // console.log(this.spellsStorage);
                 }
 
                 //Air
                 if(this.leftMouseJustDown == true) {
-                    SpellManager.addSpellToSlot(this, 'air', 'airUI');
+                    this.spellManager.addSpellToSlot(this, 'air', 'airUI');
                     this.leftMouseJustDown = false; // Only click for 1 frame
                     // console.log(this.spellsStorage);
                 }
 
                 //Earth
                 if(this.rightMouseJustDown == true) {
-                    SpellManager.addSpellToSlot(this, 'earth', 'earthUI');
+                    this.spellManager.addSpellToSlot(this, 'earth', 'earthUI');
                     this.rightMouseJustDown = false; // Only click for 1 frame
                     // console.log(this.spellsStorage);
                 }
@@ -219,15 +230,17 @@
                 this.player.AttachWandToPlayerAndRotate(this);
                 
                 //Remove spells from world if out of bounds
-                SpellManager.removeSpellIfOutOfBounds(this, Main.BOUNDS_X, Main.BOUNDS_Y);
+                this.spellManager.removeSpellIfOutOfBounds(this, Main.BOUNDS_X, Main.BOUNDS_Y);
                 
                 //Background movement with the player
                 background.tilePositionX = cam.scrollX;
                 background.tilePositionY = cam.scrollY;
             }
 
-            gameOver() {
-                this.isGameOver = true;
+            gameOver(player,enemy) {
+                if(!player.isShielded) {
+                    this.isGameOver = true;
+                }
             }
 
             addColliders() {
@@ -243,6 +256,30 @@
 
                 //Spell-Enemy collision
                 this.physics.add.collider(this.spells, this.enemiesGroup, EnemyManager.killEnemy, null, this);
+
+                //Power-ups collision
+                this.physics.add.collider(this.player, this.powerUpsGroup, this.powerUpPickup, null, this);
+            }
+
+            powerUpPickup(player, powerUp) {
+                switch(powerUp.powerUpType) {
+                    case 'IncreasedSpeed':
+                        this.powerUpsManager.addPowerUp('IncreasedSpeed', new PowerUpEffects.IncreasedSpeed(player), 5000);
+                        break;
+                    case 'IncreasedFireRate':
+                        this.powerUpsManager.addPowerUp('IncreasedFireRate', new PowerUpEffects.IncreasedFireRate(this.spellManager), 5000);
+                        break;
+                    case 'ShieldPlayer':
+                        this.powerUpsManager.addPowerUp('ShieldPlayer', new PowerUpEffects.ShieldPlayer(player), 2000);
+                        break;
+                    case 'FreezeEnemies':
+                        this.powerUpsManager.addPowerUp('FreezeEnemies', new PowerUpEffects.FreezeEnemies(this.enemiesGroup), 3000);
+                        break;
+                    default: 
+                        break;
+                }
+                this.time.delayedCall( 5000, this.powerUpsManager.respawnPowerUp, [powerUp], this.powerUpsManager);
+                powerUp.destroy();
             }
         }
 

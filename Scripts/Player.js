@@ -4,18 +4,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
-        this.enemiesKilled = 0;
+        this.speed = 160;
+        this.gravity = -360;
+        this.isShielded = false;
+        this.shield = scene.add.image(0,0, 'player-shield');
+        this.shield.setVisible(false);
     }
 
-    Movement(cursors, speed) {
+    Movement(cursors) {
         if (cursors.left.isDown)
         {
-            this.setVelocityX(-speed);
+            this.setVelocityX(-this.speed);
             this.anims.play('left', true);
         }
         else if (cursors.right.isDown)
         {
-            this.setVelocityX(speed);
+            this.setVelocityX(this.speed);
             this.anims.play('right', true);
         }
         else
@@ -27,6 +31,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         {
             this.setVelocityY(-360);
         }
+
+        this.shield.setPosition(this.x, this.y);
     }
 
     AttachWandToPlayerAndRotate(scene) {
