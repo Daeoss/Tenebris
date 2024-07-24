@@ -1,5 +1,6 @@
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    static MAX_ARMORS = 2;
+    static MAX_ARMORS = 3;
+    static idCounter = 0;
     constructor(scene, x, y, texture) {
         //Scene setup
         super(scene, x, y, texture);
@@ -17,11 +18,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         //Attributes setup
         this.health = this.armorTypes.length;
         scene.enemiesGroup.add(this);
+        this.speed = 100;
     }
 
     pickArmorTypes(armorTypes) {
         const numOfArmors = Phaser.Math.Between(1,Enemy.MAX_ARMORS);
         const shuffled = Phaser.Utils.Array.Shuffle(armorTypes);
         return shuffled.slice(0, numOfArmors);
+    }
+
+    generateUniqueId() {
+        return ++Enemy.idCounter;
     }
 }
