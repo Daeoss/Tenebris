@@ -44,7 +44,7 @@
                 this.rightMouseJustDown = false;
                 this.spellsStorage = [];
                 this.spellHolders = {
-                    0: {x:375,y:50}, 
+                    0: {x:350,y:50}, 
                     1: {x:450,y:50},
                     // holder1: {x:325,y:50}, 
                     // holder2: {x:400,y:50},
@@ -55,7 +55,7 @@
                         title:'wave1',
                         time: 1000,
                         enemies: [
-                            { type: 'flying', count:100, interval: 1500 }
+                            { type: 'flying', count:1, interval: 1500 }
                         ],
                     },
                     {
@@ -93,10 +93,10 @@
                 this.load.image('flying-shadow', 'Assets/Media/Finished/FlyingShadow.png');
                 this.load.image('wand', 'Assets/Media/Finished/wand.png');
                 this.load.image('fire', 'Assets/Media/Finished/fire.png');
-                this.load.image('fireUI', 'Assets/Media/Finished/fireUI.png');
-                this.load.image('waterUI', 'Assets/Media/Finished/waterUI.png');
-                this.load.image('airUI', 'Assets/Media/Finished/airUI.png');
-                this.load.image('earthUI', 'Assets/Media/Finished/earthUI.png');
+                this.load.image('rune_n', 'Assets/Media/Finished/rune_n.png');
+                this.load.image('rune_y', 'Assets/Media/Finished/rune_y.png');
+                this.load.image('rune_x', 'Assets/Media/Finished/rune_x.png');
+                this.load.image('rune_t', 'Assets/Media/Finished/rune_t.png');
                 this.load.image('spell-holder', 'Assets/Media/Finished/spell-holder.png');
                 this.load.image('bullet-icon', 'Assets/Media/Finished/bullet-icon.png');
                 this.load.image('speed-icon', 'Assets/Media/Finished/speed-icon.png');
@@ -104,8 +104,10 @@
                 this.load.image('freeze-icon', 'Assets/Media/Finished/freeze-icon.png');
                 this.load.image('bonus-icon', 'Assets/Media/Finished/bonus-icon.png');
                 this.load.image('player-shield', 'Assets/Media/Finished/player-shield.png');
-                this.load.spritesheet('dude', 'Assets/Media/Finished/dude.png', { frameWidth: 32, frameHeight: 48 });
+                this.load.image('particle', 'Assets/Media/Finished/particle.png');
+                this.load.image('bloodParticle', 'Assets/Media/Finished/bloodParticle.png');
                 this.load.spritesheet('mainCharacter', 'Assets/Media/Finished/mainCharacter.png', { frameWidth: 32, frameHeight: 48 });
+                this.load.spritesheet('shootEffect', 'Assets/Media/Finished/shootEffect.png', { frameWidth: 16, frameHeight: 16 });
 
                 this.load.image("tiles", "Assets/Media/Finished/tileset.png");
                 this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
@@ -197,7 +199,7 @@
 
                 Setup.setUpUI(this);
 
-                this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '32px', fill: '#000' });
+                this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '32px', fill: '#fff' });
                 this.scoreText.setScrollFactor(0);
             }
 
@@ -215,30 +217,27 @@
                 EnemyManager.aiMovement(this, this.player);
 
                 //Spell selection
-                //Fire
+                //Rune N
                 if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
-                    this.spellManager.addSpellToSlot(this, 'fire', 'fireUI');
+                    this.spellManager.addSpellToSlot(this, 'fire', 'rune_n');
                     // console.log(this.spellsStorage);
                 }
 
-                //Water
+                //Rune Y
                 if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
-                    this.spellManager.addSpellToSlot(this, 'water', 'waterUI');
-                    // console.log(this.spellsStorage);
+                    this.spellManager.addSpellToSlot(this, 'water', 'rune_y');
                 }
 
-                //Air
+                //Rune X
                 if(this.leftMouseJustDown == true) {
-                    this.spellManager.addSpellToSlot(this, 'air', 'airUI');
+                    this.spellManager.addSpellToSlot(this, 'air', 'rune_x');
                     this.leftMouseJustDown = false; // Only click for 1 frame
-                    // console.log(this.spellsStorage);
                 }
 
-                //Earth
+                //Rune T
                 if(this.rightMouseJustDown == true) {
-                    this.spellManager.addSpellToSlot(this, 'earth', 'earthUI');
+                    this.spellManager.addSpellToSlot(this, 'earth', 'rune_t');
                     this.rightMouseJustDown = false; // Only click for 1 frame
-                    // console.log(this.spellsStorage);
                 }
 
                 //Wand sticks to player

@@ -43,6 +43,16 @@ export function setUpAnimations(scene) {
         frameRate: 10,
         repeat: -1
     });
+
+    // scene.anims.create({
+    //     key: 'shoot',
+    //     frames: scene.anims.generateFrameNumbers('shootEffect', {start:0, end:4}),
+    //     frameRate: 30,
+    //     repeat: 0,
+    //     onComplete: function() {
+    //         this.sprite.setFrame(0);
+    //     }
+    // })
 }
 
 export function setUpPlatforms(scene, map, tileset) {
@@ -62,8 +72,8 @@ export function setUpUI(scene) {
     for(let holder in scene.spellHolders) {
         let x = scene.spellHolders[holder].x;
         let y = scene.spellHolders[holder].y;
-        var sh = scene.add.image(x, y, 'spell-holder').setScale(3);
-        sh.setDepth(1);
+        var sh = scene.add.image(x, y, 'spell-holder').setScale(2);
+        //sh.setDepth(1);
         sh.setScrollFactor(0);
     }
 }

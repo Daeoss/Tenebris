@@ -9,6 +9,12 @@ export default class PowerUpManager {
             {image: 'freeze-icon', name: 'FreezeEnemies'},
         ];
         this.countTypes = this.powerUpTypes.length;
+        this.activePowerUps = [];
+
+        this.UIPowerUpOffsetX = 360;
+        this.UIPowerUpOffsetY = 115;
+        this.UIPowerUpSpacing = 50;
+        this.UIPowerUpCenterX = 400;
     }
 
     spawnPowerUps(map) {
@@ -41,6 +47,8 @@ export default class PowerUpManager {
             timer: this.scene.time.delayedCall(duration, () => this.removePowerUp(name), [], this)
         };
 
+        this.showOnUI(name);
+
         effect.activate();
     }
 
@@ -48,12 +56,47 @@ export default class PowerUpManager {
         if(this.powerUps[name]) {
             this.powerUps[name].effect.deactivate();
             this.powerUps[name].timer.remove();
+            this.removeFromUI(name);
             delete this.powerUps[name];
         }
     }
 
     clearPowerUps() {
         Object.keys(this.powerUps).forEach(name => this.removePowerUp(name));
+    }
+
+    showOnUI(name) {
+        const powerUpType = this.powerUpTypes.find(obj => obj.name == name);
+        if(powerUpType && !this.activePowerUps[name]) {
+            let spellImage = this.scene.add.image(0,0, powerUpType.image);
+            spellImage.name = name;
+            spellImage.setScale(0.5);
+            spellImage.setScrollFactor(0);    
+            this.activePowerUps[name] = spellImage;
+        }
+        this.repositionActivePowerUps();
+    }
+
+    removeFromUI(name) {
+        let spellImage = this.activePowerUps[name];
+        if(spellImage) {
+            spellImage.destroy(); 
+            delete this.activePowerUps[name]; 
+        }
+        this.repositionActivePowerUps();
+    }
+
+    repositionActivePowerUps() {
+        const activeCount = Object.keys(this.activePowerUps).length;
+        const totalWidth = (activeCount - 1) * this.UIPowerUpSpacing;
+        const startX = this.UIPowerUpCenterX - totalWidth / 2;
+        let offsetX = startX;
+        let offsetY = this.UIPowerUpOffsetY;
+
+        for(let name in this.activePowerUps) {
+            this.activePowerUps[name].setPosition(offsetX, offsetY)
+            offsetX += this.UIPowerUpSpacing;
+        }
     }
 
     spawnBonus(map) {
