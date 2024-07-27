@@ -13,20 +13,33 @@ export function setUpKeyboardControls(scene) {
 export function setUpAnimations(scene) {
     scene.anims.create({
         key: 'left',
-        frames: scene.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+        frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1
     });
 
     scene.anims.create({
         key: 'turn',
-        frames: [ { key: 'dude', frame: 4 } ],
+        frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 4, end: 5 }),
+        frameRate: 5,
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'jump_up',
+        frames: [ { key: 'mainCharacter', frame: 6 } ],
+        frameRate: 20
+    });
+
+    scene.anims.create({
+        key: 'jump_down',
+        frames: [ { key: 'mainCharacter', frame: 7 } ],
         frameRate: 20
     });
 
     scene.anims.create( {
         key: 'right',
-        frames: scene.anims.generateFrameNumbers('dude', {start:5, end:8}),
+        frames: scene.anims.generateFrameNumbers('mainCharacter', {start:8, end:11}),
         frameRate: 10,
         repeat: -1
     });

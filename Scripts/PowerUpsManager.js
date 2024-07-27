@@ -55,4 +55,19 @@ export default class PowerUpManager {
     clearPowerUps() {
         Object.keys(this.powerUps).forEach(name => this.removePowerUp(name));
     }
+
+    spawnBonus(map) {
+        //Get tiled coordinates and spawn power-ups on the map
+        const spawnPoints = map.getObjectLayer("BonusPoints");
+        spawnPoints.objects.forEach((object => {
+            this.scene.bonusGroup.create(object.x, object.y, 'bonus-icon' ).setScale(0.5).refreshBody();
+        }));
+    }
+
+    addBonus(player, bonus) {
+        this.score+=500;
+        this.scoreText.setText('Score: ' + this.score);
+        bonus.destroy();
+        return;
+    }
 }
