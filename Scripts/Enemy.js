@@ -9,10 +9,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
         //Armor setup
         this.allArmorTypes = [
-            { name: 'fire', imageName: 'fireUI' },
-            { name: 'water', imageName: 'waterUI' },
-            { name: 'air', imageName: 'airUI' },
-            { name: 'earth', imageName: 'earthUI' },
+            { name: 'fire', imageName: 'rune_n' },
+            { name: 'water', imageName: 'rune_y' },
+            { name: 'air', imageName: 'rune_x' },
+            { name: 'earth', imageName: 'rune_t' },
         ];
         this.armorTypes = this.pickArmorTypes(this.allArmorTypes);
         //Attributes setup

@@ -54,7 +54,8 @@ export function killEnemy(spell, enemy) {
         //Remove the armor UI
         if (enemy.armorIndicators) {
             enemy.armorIndicators.forEach((indicator) => {
-                indicator.destroy();
+                indicator.image.destroy();
+                indicator.imagePlaceholder.destroy();
             });
         }
         //Kill the enemy
@@ -63,6 +64,11 @@ export function killEnemy(spell, enemy) {
         this.score++;
         this.scoreText.setText('Score: ' + this.score);    
     }
+    //On hit blood particles
+    
+    //Spell particles
+    spell.particles.stop();
+    spell.particles.destroy();
     spell.destroy();
 }
 
@@ -72,10 +78,11 @@ export function aiMovement(scene, player) {
         scene.physics.moveToObject(enemy, player, enemy.speed);
 
         if (enemy.armorIndicators) {
-            let offset = -20;
+            let offset = -25;
             enemy.armorIndicators.forEach((indicator) => {
-                indicator.setPosition(enemy.x + offset, enemy.y - 30);
-                offset += 20;
+                indicator.image.setPosition(enemy.x + offset, enemy.y - 30).setScale(0.7);
+                indicator.imagePlaceholder.setPosition(enemy.x + offset, enemy.y - 30).setScale(0.7);
+                offset += 25;
             });
         }
     });
@@ -85,9 +92,10 @@ export function addArmorIndicators(scene, armorTypes, enemy) {
     enemy.armorIndicators = [];
     armorTypes.forEach((type, i) => {
         if(!type.image) {
-            type.image = scene.add.image(0,1000,type.imageName);
+            type.imagePlaceholder = scene.add.image(0,0,'spell-holder');
+            type.image = scene.add.image(0,0,type.imageName);
         }
-        enemy.armorIndicators.push(type.image);
+        enemy.armorIndicators.push({image: type.image, imagePlaceholder: type.imagePlaceholder});
     });
 }
 

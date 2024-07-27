@@ -18,12 +18,15 @@
             "scaleInEditor": 1
         },
         "mainTileset.tmx": {
-            "scale": 0.25,
+            "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1160,
-                "y": 830
+                "x": 1622,
+                "y": 678
             }
+        },
+        "mainTileset.tmx#mainTileset": {
+            "scaleInDock": 1.5
         },
         "mainTileset.tmx#test_tileset": {
             "scaleInDock": 1
@@ -60,7 +63,7 @@
         "mainTileset.tmx"
     ],
     "project": "tenebris.tiled-project",
-    "property.type": "string",
+    "property.type": "bool",
     "recentFiles": [
         "mainTileset.tmx",
         "test2Tileset.tmx",
@@ -72,7 +75,7 @@
     "tileset.lastUsedFormat": "tsx",
     "tileset.spacing": 0,
     "tileset.tileSize": {
-        "height": 32,
-        "width": 32
+        "height": 16,
+        "width": 16
     }
 }
