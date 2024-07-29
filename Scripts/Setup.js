@@ -54,6 +54,24 @@ export function setUpAnimations(scene) {
         });
     }
 
+    if(!scene.anims.exists('bonus')) {
+        scene.anims.create( {
+            key: 'bonus',
+            frames: scene.anims.generateFrameNumbers('bonus-icon', {start:0, end:7}),
+            frameRate: 10,
+            repeat: -1
+        });
+    }
+
+    if(!scene.anims.exists('enemy')) {
+        scene.anims.create( {
+            key: 'enemy',
+            frames: scene.anims.generateFrameNumbers('enemy', {start:0, end:3}),
+            frameRate: 4,
+            repeat: -1
+        });
+    }
+
     // scene.anims.create({
     //     key: 'shoot',
     //     frames: scene.anims.generateFrameNumbers('shootEffect', {start:0, end:4}),

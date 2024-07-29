@@ -125,7 +125,8 @@ export default class PowerUpManager {
         //Get tiled coordinates and spawn power-ups on the map
         const spawnPoints = map.getObjectLayer("BonusPoints");
         spawnPoints.objects.forEach((object => {
-            this.scene.bonusGroup.create(object.x, object.y, 'bonus-icon' ).setScale(0.5).refreshBody();
+            let bonus = this.scene.bonusGroup.create(object.x, object.y, 'bonus-icon' ).setScale(0.5).refreshBody();
+            bonus.anims.play('bonus');
         }));
     }
 
@@ -155,6 +156,7 @@ export default class PowerUpManager {
                 break;
         }
         this.scene.time.delayedCall( 5000, this.respawnPowerUp, [powerUp], this.scene.powerUpsManager);
+        this.scene.soundEffects['powerUp'].play();
         powerUp.particles.stop();
         powerUp.particles.destroy();
         powerUp.destroy();
