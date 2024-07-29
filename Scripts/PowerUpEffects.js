@@ -49,6 +49,7 @@ export class FreezeEnemies {
     }
 
     activate() {
+        console.log(this);
         this.enemies.getChildren().forEach((enemy) => {
             this.velocities.push({id: enemy.id, velocity: enemy.speed});
             enemy.speed = 0;
