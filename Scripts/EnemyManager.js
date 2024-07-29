@@ -151,11 +151,19 @@ export default class EnemyManager {
             for(let i = 0; i<info.count; i++) {
                 scene.time.addEvent({
                     delay: info.interval * i,
-                    callback: spawnEnemy,
-                    callbackScope: scene,
+                    callback: this.spawnEnemy.bind(this),
                 });
             }
         });
+    }
+
+    bloodParticles(enemy) {
+        let bloodParticle = this.scene.add.particles(0, 0, 'bloodParticle', {
+            speed: 200,
+            scale: {start:1, end:0},
+            blendMode: 'MULTIPLY',
+        });
+        bloodParticle.explode(30, enemy.x, enemy.y);
     }
 }
 

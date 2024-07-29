@@ -1,3 +1,5 @@
+import * as PowerUpEffects from './PowerUpEffects.js';
+
 export default class PowerUpManager {
     constructor(scene) {
         this.scene = scene;
@@ -23,6 +25,8 @@ export default class PowerUpManager {
         spawnPoints.objects.forEach((object => {
             let powerUpType = this.powerUpTypes[Phaser.Math.Between(0,this.countTypes - 1)];
             let powerUp = this.scene.powerUpsGroup.create(object.x, object.y, powerUpType.image ).setScale(0.5).refreshBody();
+            this.addParticles(powerUp);
+            powerUp.setDepth(1);
             powerUp.powerUpType = powerUpType.name;
             powerUp.image = powerUpType.image;
         }));
@@ -32,6 +36,8 @@ export default class PowerUpManager {
         //Get the same coordinates from the old power-up and spawn a new one in the same place
         let type = this.powerUpTypes[Phaser.Math.Between(0,this.countTypes - 1)];
         let powerUp = this.scene.powerUpsGroup.create(deletedPowerUp.x, deletedPowerUp.y, type.image ).setScale(0.5).refreshBody();
+        this.addParticles(powerUp);
+        powerUp.setDepth(1);
         powerUp.powerUpType = type.name;
         powerUp.image = type.image;
     }
@@ -99,6 +105,22 @@ export default class PowerUpManager {
         }
     }
 
+    addParticles(powerUp) {
+        powerUp.particles = this.scene.add.particles(powerUp.x, powerUp.y, 'particle', {
+            //angle: {min: 0, max: -180},
+            speed: 100,
+            quantity: 3,
+            scale: { start: 1, end: 0 },
+            lifespan: 400,
+            blendMode: 'ADD',
+            frequency: 150,
+        }).setDepth(0);
+    }
+
+    removeParticles(powerUp) {
+
+    }
+
     spawnBonus(map) {
         //Get tiled coordinates and spawn power-ups on the map
         const spawnPoints = map.getObjectLayer("BonusPoints");
@@ -112,5 +134,29 @@ export default class PowerUpManager {
         this.scoreText.setText('Score: ' + this.score);
         bonus.destroy();
         return;
+    }
+
+    powerUpPickup(player, powerUp) {
+        switch(powerUp.powerUpType) {
+            case 'IncreasedSpeed':
+                this.addPowerUp('IncreasedSpeed', new PowerUpEffects.IncreasedSpeed(player), 5000);
+                break;
+            case 'IncreasedFireRate':
+                this.addPowerUp('IncreasedFireRate', new PowerUpEffects.IncreasedFireRate(this.scene.spellManager), 5000);
+                break;
+            case 'ShieldPlayer':
+                this.addPowerUp('ShieldPlayer', new PowerUpEffects.ShieldPlayer(player), 2000);
+                this.addPowerUp('ShieldPlayer', new PowerUpEffects.ShieldPlayer(player), 10000);
+                break;
+            case 'FreezeEnemies':
+                this.addPowerUp('FreezeEnemies', new PowerUpEffects.FreezeEnemies(this.scene.enemiesGroup), 3000);
+                break;
+            default: 
+                break;
+        }
+        this.scene.time.delayedCall( 5000, this.respawnPowerUp, [powerUp], this.scene.powerUpsManager);
+        powerUp.particles.stop();
+        powerUp.particles.destroy();
+        powerUp.destroy();
     }
 }

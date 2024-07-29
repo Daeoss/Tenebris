@@ -1,4 +1,3 @@
-import Enemy from './Enemy.js';
 import Player from './Player.js';
 import PowerUpsManager from './PowerUpsManager.js';
 import SpellManager from './SpellManager.js';
@@ -48,6 +47,8 @@ export default class GameScene extends Phaser.Scene
         this.powerUpsManager = new PowerUpsManager(this);
         this.powerUpsGroup = this.physics.add.staticGroup();
         this.powerUpsManager.spawnPowerUps(map);
+
+        console.log(this.powerUpsManager);
 
         //Bonuses
         this.bonusGroup = this.physics.add.staticGroup();
