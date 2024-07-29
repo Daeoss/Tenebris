@@ -1,9 +1,8 @@
+import * as Setup from './Setup.js';
 import Player from './Player.js';
 import PowerUpsManager from './PowerUpsManager.js';
 import SpellManager from './SpellManager.js';
 import EnemyManager from './EnemyManager.js';
-import * as Setup from './Setup.js';
-
 
 var cam, background, cursors;
 
@@ -24,11 +23,24 @@ export default class GameScene extends Phaser.Scene
 
     create ()
     {
-
         //Music
-        this.bgMusic = this.sound.add("bg-music");
-        this.bgMusic.volume = 0.25;
+        this.bgMusic = this.sound.add("bg-music", {loop: true});
+        this.bgMusic.volume = 0.05;
         this.bgMusic.play();
+
+        //Sound effects
+        this.soundEffects['jump'] = this.sound.add("jump");
+        this.soundEffects['jump'].volume = 0.5;
+
+        this.soundEffects['powerUp'] = this.sound.add("powerUp");
+        this.soundEffects['powerUp'].volume = 0.1;
+
+        this.addSound('selectSpell', 0.1);
+        this.addSound('attack', 0.05);
+        this.addSound('enemyDeath', 0.3);
+
+        //Animations
+        Setup.setUpAnimations(this);
 
         //Camera
         cam = this.cameras.main;
@@ -97,9 +109,6 @@ export default class GameScene extends Phaser.Scene
 
         //Collision with platforms
         this.addColliders();
-        
-        //Animations
-        Setup.setUpAnimations(this);
 
         //Keyboard keys
         cursors = Setup.setUpKeyboardControls(this);
@@ -136,23 +145,26 @@ export default class GameScene extends Phaser.Scene
         //Rune N
         if (Phaser.Input.Keyboard.JustDown(cursors.firstSpell)) {
             this.spellManager.addSpellToSlot(this, 'fire', 'rune_n');
-            // console.log(this.spellsStorage);
+            this.playSound('selectSpellPool');
         }
 
         //Rune Y
         if (Phaser.Input.Keyboard.JustDown(cursors.secondSpell)) {
             this.spellManager.addSpellToSlot(this, 'water', 'rune_y');
+            this.playSound('selectSpellPool');
         }
 
         //Rune X
         if(this.leftMouseJustDown == true) {
             this.spellManager.addSpellToSlot(this, 'air', 'rune_x');
+            this.playSound('selectSpellPool');
             this.leftMouseJustDown = false; // Only click for 1 frame
         }
 
         //Rune T
         if(this.rightMouseJustDown == true) {
             this.spellManager.addSpellToSlot(this, 'earth', 'rune_t');
+            this.playSound('selectSpellPool');
             this.rightMouseJustDown = false; // Only click for 1 frame
         }
 
@@ -176,6 +188,24 @@ export default class GameScene extends Phaser.Scene
             }
             this.scene.start("EndGameScene", {score: this.score, highscore: this.highscore});
         }
+    }
+
+    addSound(name, volume, poolSize = 10, loopBool = false) {
+        this.soundEffects[name+'Pool'] = [];
+        for(let i = 0; i < poolSize; i++) {
+            let sound = this.sound.add(name, {loop: loopBool});
+            sound.volume = volume;
+            this.soundEffects[name+'Pool'].push(sound);
+        }
+    }
+
+    playSound(poolName) {
+        let soundInstance = this.soundEffects[poolName].find(s => !s.isPlaying);
+        if(!soundInstance) {
+            soundInstance = this.soundEffects[poolName][0];
+            soundInstance.stop();
+        }
+        soundInstance.play();
     }
 
     addColliders() {
@@ -216,6 +246,7 @@ export default class GameScene extends Phaser.Scene
         this.grounds = null;
         this.platforms = null;
         this.bgMusic = null;
+        this.soundEffects = [];
         this.isGameOver = false;
         this.leftMouseJustDown = false;
         this.rightMouseJustDown = false;
@@ -249,17 +280,25 @@ export default class GameScene extends Phaser.Scene
         this.load.image('speed-icon', 'Assets/Media/Finished/speed-icon.png');
         this.load.image('shield-icon', 'Assets/Media/Finished/shield-icon.png');
         this.load.image('freeze-icon', 'Assets/Media/Finished/freeze-icon.png');
-        this.load.image('bonus-icon', 'Assets/Media/Finished/bonus-icon.png');
+        
         this.load.image('player-shield', 'Assets/Media/Finished/player-shield.png');
         this.load.image('particle', 'Assets/Media/Finished/particle.png');
         this.load.image('bloodParticle', 'Assets/Media/Finished/bloodParticle.png');
         //Sprites
         this.load.spritesheet('mainCharacter', 'Assets/Media/Finished/mainCharacter.png', { frameWidth: 32, frameHeight: 48 });
         this.load.spritesheet('shootEffect', 'Assets/Media/Finished/shootEffect.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('bonus-icon', 'Assets/Media/Finished/bonus-icon.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.spritesheet('enemy', 'Assets/Media/Finished/enemy.png', { frameWidth: 128, frameHeight: 128 });
         //Map
         this.load.image("tiles", "Assets/Media/Finished/tileset.png");
         this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
         //Sound
         this.load.audio("bg-music", "../Assets/Sounds/Music/ThreeRedHearts-DeepBlue.ogg");
+        this.load.audio("selectSpell", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/selectSpell.wav");
+        this.load.audio("attack", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/attack.wav");
+        this.load.audio("enemyDeath", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/enemyDeath.wav");
+        this.load.audio("jump", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/jump.wav");
+        this.load.audio("walk", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/walk.wav");
+        this.load.audio("powerUp", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/powerUp.wav");
     }
 }

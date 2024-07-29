@@ -77,7 +77,7 @@ export default class EnemyManager {
                 break;
         }
     
-        let enemy = new Enemy(this.scene, x, y, 'flying-shadow');
+        let enemy = new Enemy(this.scene, x, y, 'enemy');
         this.addArmorIndicators(this.scene, enemy.armorTypes, enemy);
     }
     
@@ -97,6 +97,8 @@ export default class EnemyManager {
             this.bloodParticles(enemy);
             //Kill the enemy
             enemy.destroy();
+
+            this.playSound();
             //Set score
             this.scene.score++;
             this.scene.scoreText.setText('Score: ' + this.scene.score);    
@@ -113,6 +115,7 @@ export default class EnemyManager {
             // Enemy follows the player
             scene.physics.moveToObject(enemy, player, enemy.speed);
     
+            //Add armor indicator
             if (enemy.armorIndicators) {
                 let offset = -25;
                 enemy.armorIndicators.forEach((indicator) => {
@@ -121,6 +124,16 @@ export default class EnemyManager {
                     offset += 25;
                 });
             }
+
+            //Flip to look at player
+            if(enemy) {
+                if (player.x < enemy.x) {
+                    enemy.setFlipX(true);
+                } else {
+                    enemy.setFlipX(false);
+                }
+            }
+            
         });
     }
     
@@ -164,6 +177,15 @@ export default class EnemyManager {
             blendMode: 'MULTIPLY',
         });
         bloodParticle.explode(30, enemy.x, enemy.y);
+    }
+
+    playSound() {
+        let soundInstance = this.scene.soundEffects['enemyDeathPool'].find(s => !s.isPlaying);
+        if(!soundInstance) {
+            soundInstance = this.scene.soundEffects['enemyDeathPool'][0];
+            soundInstance.stop();
+        }
+        soundInstance.play();
     }
 }
 

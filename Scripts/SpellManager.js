@@ -45,6 +45,9 @@ export default class SpellManager {
 
             // this.wand.anims.play('shoot');
         }
+
+        //Play sound
+        this.playSound();
     // }
     }
 
@@ -102,6 +105,15 @@ export default class SpellManager {
             blendMode: 'MULTIPLY',
         });
         spell.particles.startFollow(spell);
+    }
+
+    playSound() {
+        let soundInstance = this.scene.soundEffects['attackPool'].find(s => !s.isPlaying);
+        if(!soundInstance) {
+            soundInstance = this.scene.soundEffects['attackPool'][0];
+            soundInstance.stop();
+        }
+        soundInstance.play();
     }
 }
 

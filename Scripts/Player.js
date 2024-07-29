@@ -39,10 +39,32 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
         if (cursors.up.isDown && this.body.blocked.down)
         {
+            this.scene.soundEffects['jump'].play();
             this.setVelocityY(-250);
         }
-        
 
+        // Handle down cursor key
+        if (cursors.down.isDown) {
+            this.setVelocityY(400);
+            this.body.setAllowGravity(false);
+            this.setSize(this.width, this.height / 1.5);
+            this.canPassThrough = true; 
+        } else {
+            this.body.setAllowGravity(true);
+            this.setSize(this.width, this.height);
+            this.canPassThrough = false;
+        }
+
+        if(this.canPassThrough) {
+            this.scene.platforms.forEachTile((tile) => {
+                tile.collideUp = false;
+            });
+        }else{
+            this.scene.platforms.forEachTile((tile) => {
+                tile.collideUp = true;
+            });
+        }
+        
         this.shield.setPosition(this.x, this.y);
     }
 
