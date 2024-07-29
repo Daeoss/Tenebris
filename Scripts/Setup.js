@@ -11,38 +11,48 @@ export function setUpKeyboardControls(scene) {
 }
 
 export function setUpAnimations(scene) {
-    scene.anims.create({
-        key: 'left',
-        frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
+    if(!scene.anims.exists('left')) {
+        scene.anims.create({
+            key: 'left',
+            frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+    }
 
-    scene.anims.create({
-        key: 'turn',
-        frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 4, end: 5 }),
-        frameRate: 5,
-        repeat: -1
-    });
+    if(!scene.anims.exists('turn')) {
+        scene.anims.create({
+            key: 'turn',
+            frames: scene.anims.generateFrameNumbers('mainCharacter', { start: 4, end: 5 }),
+            frameRate: 3,
+            repeat: -1
+        });
+    }
 
-    scene.anims.create({
-        key: 'jump_up',
-        frames: [ { key: 'mainCharacter', frame: 6 } ],
-        frameRate: 20
-    });
+    if(!scene.anims.exists('jump_up')) {
+        scene.anims.create({
+            key: 'jump_up',
+            frames: [ { key: 'mainCharacter', frame: 6 } ],
+            frameRate: 20
+        });
+    }
 
-    scene.anims.create({
-        key: 'jump_down',
-        frames: [ { key: 'mainCharacter', frame: 7 } ],
-        frameRate: 20
-    });
+    if(!scene.anims.exists('jump_down')) {
+        scene.anims.create({
+            key: 'jump_down',
+            frames: [ { key: 'mainCharacter', frame: 7 } ],
+            frameRate: 20
+        });
+    }
 
-    scene.anims.create( {
-        key: 'right',
-        frames: scene.anims.generateFrameNumbers('mainCharacter', {start:8, end:11}),
-        frameRate: 10,
-        repeat: -1
-    });
+    if(!scene.anims.exists('right')) {
+        scene.anims.create( {
+            key: 'right',
+            frames: scene.anims.generateFrameNumbers('mainCharacter', {start:8, end:11}),
+            frameRate: 10,
+            repeat: -1
+        });
+    }
 
     // scene.anims.create({
     //     key: 'shoot',
