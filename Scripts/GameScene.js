@@ -24,6 +24,12 @@ export default class GameScene extends Phaser.Scene
 
     create ()
     {
+
+        //Music
+        this.bgMusic = this.sound.add("bg-music");
+        this.bgMusic.volume = 0.25;
+        this.bgMusic.play();
+
         //Camera
         cam = this.cameras.main;
         cam.setBounds(0,0,GameScene.BOUNDS_X, GameScene.BOUNDS_Y);
@@ -47,8 +53,6 @@ export default class GameScene extends Phaser.Scene
         this.powerUpsManager = new PowerUpsManager(this);
         this.powerUpsGroup = this.physics.add.staticGroup();
         this.powerUpsManager.spawnPowerUps(map);
-
-        console.log(this.powerUpsManager);
 
         //Bonuses
         this.bonusGroup = this.physics.add.staticGroup();
@@ -166,6 +170,7 @@ export default class GameScene extends Phaser.Scene
     gameOver(player,enemy) {
         if(!player.isShielded) {
             this.isGameOver = true;
+            this.bgMusic.stop();
             if(this.score > this.highscore) {
                 this.highscore = this.score;
             }
@@ -210,6 +215,7 @@ export default class GameScene extends Phaser.Scene
         this.scoreText = null;
         this.grounds = null;
         this.platforms = null;
+        this.bgMusic = null;
         this.isGameOver = false;
         this.leftMouseJustDown = false;
         this.rightMouseJustDown = false;
@@ -224,6 +230,7 @@ export default class GameScene extends Phaser.Scene
     }
 
     loadImages() {
+        //Images
         this.load.image('sky', 'Assets/Media/Finished/sky.png');
         this.load.image('behind', 'Assets/Media/Finished/behind.png');
         this.load.image('ground', 'Assets/Media/Finished/platform.png');
@@ -246,10 +253,13 @@ export default class GameScene extends Phaser.Scene
         this.load.image('player-shield', 'Assets/Media/Finished/player-shield.png');
         this.load.image('particle', 'Assets/Media/Finished/particle.png');
         this.load.image('bloodParticle', 'Assets/Media/Finished/bloodParticle.png');
+        //Sprites
         this.load.spritesheet('mainCharacter', 'Assets/Media/Finished/mainCharacter.png', { frameWidth: 32, frameHeight: 48 });
         this.load.spritesheet('shootEffect', 'Assets/Media/Finished/shootEffect.png', { frameWidth: 16, frameHeight: 16 });
-
+        //Map
         this.load.image("tiles", "Assets/Media/Finished/tileset.png");
         this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
+        //Sound
+        this.load.audio("bg-music", "../Assets/Sounds/Music/ThreeRedHearts-DeepBlue.ogg");
     }
 }
