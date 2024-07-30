@@ -38,21 +38,26 @@ export default class EnemyManager {
     calculateDamage(enemy, spell) {
         let matches = 0;
         let armorTypesTemp = [...enemy.armorTypes]; //Create a copy of the enemy's armor types
-        this.scene.spellsStorage.forEach((spell, i) => { // Loop over the selected spells
-            // Find the index of the spell name in the armorTypesTemp array
-            let index = armorTypesTemp.findIndex(armor => armor.name === spell.name);
-    
-            if (index !== -1) {
-                matches++;
-                enemy.armorTypes.splice(index, 1); // Delete the matched armor type from the temporary array
-                enemy.armorIndicators.forEach((indicator) => {
-                    if(indicator.image.name == spell.image.name) {
-                        indicator.image.destroy();
-                        indicator.imagePlaceholder.destroy();
-                    }
-                });
-            }
-        });
+        if(!spell.increasedFireRate) {
+            this.scene.spellsStorage.forEach((spell, i) => { // Loop over the selected spells
+                // Find the index of the spell name in the armorTypesTemp array
+                let index = armorTypesTemp.findIndex(armor => armor.name === spell.name);
+        
+                if (index !== -1) {
+                    matches++;
+                    enemy.armorTypes.splice(index, 1); // Delete the matched armor type from the temporary array
+                    enemy.armorIndicators.forEach((indicator) => {
+                        if(indicator.image.name == spell.image.name) {
+                            indicator.image.destroy();
+                            indicator.imagePlaceholder.destroy();
+                        }
+                    });
+                }
+            });
+        }else{
+            matches = 99;
+        }
+        
         return matches;
     }
     

@@ -3,6 +3,7 @@ export default class SpellManager {
         this.scene = scene;
         this.fireRate = 500;
         this.autoShootEvent = null;
+        this.increasedFireRate = false;
     }
 
     setFireRate(fireRate) {
@@ -47,6 +48,7 @@ export default class SpellManager {
     
             this.scene.physics.velocityFromRotation(angle, 500, spell.body.velocity);
             spell.rotation = angle;
+            spell.increasedFireRate = this.increasedFireRate;
 
             spell.setPipeline("Light2D");
             // this.wand.anims.play('shoot');
