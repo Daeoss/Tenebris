@@ -100,8 +100,8 @@ export default class EnemyManager {
 
             this.playSound();
             //Set score
-            this.scene.score++;
-            this.scene.scoreText.setText('Score: ' + this.scene.score);    
+            this.scene.deathsScore++;
+            this.scene.killsText.setText('x' + this.scene.deathsScore);    
         }
     
         //Spell particles

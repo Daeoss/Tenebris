@@ -97,6 +97,7 @@ export function setUpPlatforms(scene, map, tileset) {
 }
 
 export function setUpUI(scene) {
+    //Spell holders
     for(let holder in scene.spellHolders) {
         let x = scene.spellHolders[holder].x;
         let y = scene.spellHolders[holder].y;
@@ -104,4 +105,12 @@ export function setUpUI(scene) {
         //sh.setDepth(1);
         sh.setScrollFactor(0);
     }
+
+    //Score icons
+    scene.add.image(20,30, 'skull-icon').setScrollFactor(0).setScale(0.5);
+    scene.add.image(20,50, 'star-icon').setScrollFactor(0).setScale(0.5);
+
+    scene.killsText = scene.add.text(33, 23, 'x0', { fontSize: '12px', fill: '#fff' }).setScrollFactor(0);
+    scene.starText = scene.add.text(33, 43, 'x0', { fontSize: '12px', fill: '#fff' }).setScrollFactor(0);
+    // this.scoreText.setScrollFactor(0);
 }

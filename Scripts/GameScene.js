@@ -122,9 +122,6 @@ export default class GameScene extends Phaser.Scene
         */
 
         Setup.setUpUI(this);
-
-        this.scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '32px', fill: '#fff' });
-        this.scoreText.setScrollFactor(0);
     }
 
     update () 
@@ -181,6 +178,7 @@ export default class GameScene extends Phaser.Scene
     gameOver(player,enemy) {
         if(!player.isShielded) {
             this.isGameOver = true;
+            this.score = this.deathsScore + (this.starScore * 500);
             if(this.score > this.highscore) {
                 this.highscore = this.score;
             }
@@ -229,6 +227,8 @@ export default class GameScene extends Phaser.Scene
 
     loadVariables() {
         this.score = 0;
+        this.starScore = 0;
+        this.deathsScore = 0;
         this.currentWaveIndex = 0;
 
         this.player = null;
@@ -241,6 +241,8 @@ export default class GameScene extends Phaser.Scene
         this.powerUpsManager = null;
         this.enemyManager = null;
         this.scoreText = null;
+        this.starText = null;
+        this.killsText = null;
         this.grounds = null;
         this.platforms = null;
         this.bgMusic = null;
@@ -278,6 +280,8 @@ export default class GameScene extends Phaser.Scene
         this.load.image('speed-icon', 'Assets/Media/Finished/speed-icon.png');
         this.load.image('shield-icon', 'Assets/Media/Finished/shield-icon.png');
         this.load.image('freeze-icon', 'Assets/Media/Finished/freeze-icon.png');
+        this.load.image('skull-icon', 'Assets/Media/Finished/skull-icon.png');
+        this.load.image('star-icon', 'Assets/Media/Finished/star-icon.png');
         
         this.load.image('player-shield', 'Assets/Media/Finished/player-shield.png');
         this.load.image('particle', 'Assets/Media/Finished/particle.png');
