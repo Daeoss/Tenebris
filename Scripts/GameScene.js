@@ -3,6 +3,7 @@ import Player from './Player.js';
 import PowerUpsManager from './PowerUpsManager.js';
 import SpellManager from './SpellManager.js';
 import EnemyManager from './EnemyManager.js';
+import LightsManager from './LightsManager.js';
 
 var cam, background, cursors;
 
@@ -23,8 +24,6 @@ export default class GameScene extends Phaser.Scene
 
     create (data)
     {
-        // const gameScene = this.scene.get('GameScene');
-        // gameScene.game.sound.mute = true;
         //Music
         data.music.volume = 0.05;
         //Sound effects
@@ -38,6 +37,11 @@ export default class GameScene extends Phaser.Scene
         this.addSound('attack', 0.05);
         this.addSound('enemyDeath', 0.3);
 
+        //Lights
+        this.lightManager = new LightsManager(this);
+        this.playerLight = this.lights.addLight(0,0, 200, 0x000000, 1.5);
+        this.lightManager.changeColor(this.playerLight, 1, 0.874, 0.729);
+
         //Animations
         Setup.setUpAnimations(this);
 
@@ -48,6 +52,7 @@ export default class GameScene extends Phaser.Scene
         //Enviorment
         background = this.add.tileSprite(400,300,cam.width,cam.height, 'behind');
         background.setScrollFactor(0); //keeps moving with the camera
+        background.setPipeline("Light2D");
 
         //Tilemap
         const map = this.make.tilemap({key: 'map'});
@@ -59,6 +64,7 @@ export default class GameScene extends Phaser.Scene
         //Ground
         this.grounds = map.createLayer("Ground", tileset, 0, 0);
         this.grounds.setCollisionByProperty({collides: true});
+        this.grounds.setPipeline("Light2D");
 
         //Power-ups
         this.powerUpsManager = new PowerUpsManager(this);
@@ -166,6 +172,13 @@ export default class GameScene extends Phaser.Scene
 
         //Wand sticks to player
         this.player.AttachWandToPlayerAndRotate(this);
+
+
+        if(this.spells.getChildren().length > 0) {
+            this.spells.getChildren().forEach((spell) => {
+                spell.light.setPosition(spell.x, spell.y);
+            });
+        }
         
         //Remove spells from world if out of bounds
         this.spellManager.removeSpellIfOutOfBounds(this, GameScene.BOUNDS_X, GameScene.BOUNDS_Y);
@@ -222,7 +235,7 @@ export default class GameScene extends Phaser.Scene
         this.physics.add.overlap(this.player, this.powerUpsGroup, this.powerUpsManager.powerUpPickup.bind(this.powerUpsManager), null, this);
         
         //Bonus collision
-        this.physics.add.overlap(this.player, this.bonusGroup, this.powerUpsManager.addBonus, null, this);
+        this.physics.add.overlap(this.player, this.bonusGroup, this.powerUpsManager.addBonus, null, this.powerUpsManager);
     }
 
     loadVariables() {
@@ -232,6 +245,7 @@ export default class GameScene extends Phaser.Scene
         this.currentWaveIndex = 0;
 
         this.player = null;
+        this.playerLight = null;
         this.enemiesGroup = null;
         this.powerUpsGroup = null;
         this.bonusGroup = null;
@@ -246,6 +260,7 @@ export default class GameScene extends Phaser.Scene
         this.grounds = null;
         this.platforms = null;
         this.bgMusic = null;
+        this.LightsManager = null;
         this.soundEffects = [];
         this.isGameOver = false;
         this.leftMouseJustDown = false;
@@ -254,9 +269,6 @@ export default class GameScene extends Phaser.Scene
         this.spellHolders = {
             0: {x:350,y:50}, 
             1: {x:450,y:50},
-            // holder1: {x:325,y:50}, 
-            // holder2: {x:400,y:50},
-            // holder3: {x:475,y:50},
         };
     }
 
@@ -295,10 +307,11 @@ export default class GameScene extends Phaser.Scene
         this.load.image("tiles", "Assets/Media/Finished/tileset.png");
         this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
         //Sound
-        this.load.audio("selectSpell", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/selectSpell.wav");
-        this.load.audio("attack", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/attack.wav");
-        this.load.audio("enemyDeath", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/enemyDeath.wav");
-        this.load.audio("jump", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/jump.wav");
-        this.load.audio("powerUp", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/powerUp.wav");
+        this.load.audio("selectSpell", "../Assets/Sounds/Effects/selectSpell.wav");
+        this.load.audio("attack", "../Assets/Sounds/Effects/attack.wav");
+        this.load.audio("enemyDeath", "../Assets/Sounds/Effects/enemyDeath.wav");
+        this.load.audio("jump", "../Assets/Sounds/Effects/jump.wav");
+        this.load.audio("powerUp", "../Assets/Sounds/Effects/powerUp.wav");
+        this.load.audio("bonus", "../Assets/Sounds/Effects/bonus.wav");
     }
 }

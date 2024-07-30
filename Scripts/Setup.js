@@ -94,6 +94,7 @@ export function setUpPlatforms(scene, map, tileset) {
             tile.collideRight = false;
         }
     });
+    scene.platforms.setPipeline("Light2D");
 }
 
 export function setUpUI(scene) {

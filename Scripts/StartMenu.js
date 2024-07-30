@@ -14,8 +14,8 @@ export default class StartMenu extends Phaser.Scene {
 
         //Sounds
         this.load.audio("bg-music", "../Assets/Sounds/Music/ThreeRedHearts-DeepBlue.ogg");
-        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/hoverOverButton.wav");
-        this.load.audio("pressButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/pressButton.wav");
+        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/hoverOverButton.wav");
+        this.load.audio("pressButton", "../Assets/Sounds/Effects/pressButton.wav");
     }
 
     create() {
