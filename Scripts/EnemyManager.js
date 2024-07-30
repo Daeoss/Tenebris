@@ -6,9 +6,9 @@ export default class EnemyManager {
         this.waves  = [
             {
                 title:'wave1',
-                time: 1000,
+                time: 100,
                 enemies: [
-                    { type: 'flying', count:100, interval: 1000 }
+                    { type: 'flying', count:100, interval: 1250 }
                 ],
             },
             {
@@ -51,7 +51,7 @@ export default class EnemyManager {
     }
     
     spawnEnemy() {
-        const spawnSide = Phaser.Math.Between(0,3);
+        const spawnSide = Phaser.Math.Between(0,2);
         let worldWidth = this.scene.physics.world.bounds.width;
         let worldHeight = this.scene.physics.world.bounds.height;
         let x,y;
@@ -65,11 +65,11 @@ export default class EnemyManager {
                 x = worldWidth + 50;
                 y = Phaser.Math.Between(0, worldHeight);
                 break;
-            case 2: //bottom
-                x = Phaser.Math.Between(0, worldWidth);
-                y = worldHeight + 50;
-                break;
-            case 3: //left
+            // case 2: //bottom
+            //     x = Phaser.Math.Between(0, worldWidth);
+            //     y = worldHeight + 50;
+            //     break;
+            case 2: //left
                 x = -50;
                 y = Phaser.Math.Between(0, worldHeight);
                 break;
