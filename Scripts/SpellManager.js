@@ -32,7 +32,12 @@ export default class SpellManager {
 
         if(spell) {
 
+            //Particles
             this.addParticles(spell);
+
+            //Lights
+            spell.light = this.scene.lights.addLight(0,0, 200, 0x000000, 0.75);
+            this.scene.lightManager.changeColor(spell.light, 1, 0.824, 0.549);
 
             // spell.body.setAllowGravity(false);
             spell.body.velocity.setTo(0,0);
@@ -43,6 +48,7 @@ export default class SpellManager {
             this.scene.physics.velocityFromRotation(angle, 500, spell.body.velocity);
             spell.rotation = angle;
 
+            spell.setPipeline("Light2D");
             // this.wand.anims.play('shoot');
         }
 
@@ -92,6 +98,7 @@ export default class SpellManager {
                 //Destroy the particles
                 spell.particles.stop();
                 spell.particles.destroy();
+                scene.lights.removeLight(spell.light);
                 //Destroy the bullet
                 spell.destroy();
             }
@@ -105,6 +112,7 @@ export default class SpellManager {
             blendMode: 'NORMAL',
         });
         spell.particles.startFollow(spell);
+        spell.particles.setPipeline("Light2D");
     }
 
     playSound() {

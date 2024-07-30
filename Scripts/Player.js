@@ -11,6 +11,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.shield = scene.add.image(0,0, 'player-shield');
         this.shield.setVisible(false);
         this.facing = 'right';
+        this.setPipeline("Light2D");
     }
 
     Movement(cursors) {
@@ -65,6 +66,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             });
         }
         
+        //Follow the player
+        this.scene.playerLight.setPosition(this.x, this.y);
         this.shield.setPosition(this.x, this.y);
     }
 

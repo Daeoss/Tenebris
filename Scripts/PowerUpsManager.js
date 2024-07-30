@@ -17,6 +17,8 @@ export default class PowerUpManager {
         this.UIPowerUpOffsetY = 115;
         this.UIPowerUpSpacing = 50;
         this.UIPowerUpCenterX = 400;
+        this.soundBonus = scene.sound.add('bonus');
+        this.soundBonus.volume = 0.1;
     }
 
     spawnPowerUps(map) {
@@ -27,6 +29,12 @@ export default class PowerUpManager {
             let powerUp = this.scene.powerUpsGroup.create(object.x, object.y, powerUpType.image ).setScale(0.5).refreshBody();
             this.addParticles(powerUp);
             powerUp.setDepth(1);
+            powerUp.setPipeline("Light2D");
+            //Lights
+            powerUp.light = this.scene.lights.addLight(0,0, 40, 0xffffff, 0.5);
+            this.scene.lightManager.changeColor(powerUp.light, 1, 0.874, 0.729);
+            powerUp.light.setPosition(powerUp.x, powerUp.y);
+
             powerUp.powerUpType = powerUpType.name;
             powerUp.image = powerUpType.image;
         }));
@@ -38,6 +46,12 @@ export default class PowerUpManager {
         let powerUp = this.scene.powerUpsGroup.create(deletedPowerUp.x, deletedPowerUp.y, type.image ).setScale(0.5).refreshBody();
         this.addParticles(powerUp);
         powerUp.setDepth(1);
+        //Lights
+        powerUp.setPipeline("Light2D");
+        powerUp.light = this.scene.lights.addLight(0,0, 40, 0xffffff, 0.5);
+        this.scene.lightManager.changeColor(powerUp.light, 1, 0.874, 0.729);
+        powerUp.light.setPosition(powerUp.x, powerUp.y);
+
         powerUp.powerUpType = type.name;
         powerUp.image = type.image;
     }
@@ -117,22 +131,20 @@ export default class PowerUpManager {
         }).setDepth(0);
     }
 
-    removeParticles(powerUp) {
-
-    }
-
     spawnBonus(map) {
         //Get tiled coordinates and spawn power-ups on the map
         const spawnPoints = map.getObjectLayer("BonusPoints");
         spawnPoints.objects.forEach((object => {
             let bonus = this.scene.bonusGroup.create(object.x, object.y, 'bonus-icon' ).setScale(0.5).refreshBody();
             bonus.anims.play('bonus');
+            bonus.setPipeline("Light2D");
         }));
     }
 
     addBonus(player, bonus) {
-        this.starScore+=1;
-        this.starText.setText('x' + this.starScore);
+        this.scene.starScore+=1;
+        this.scene.starText.setText('x' + this.scene.starScore);
+        this.soundBonus.play();
         bonus.destroy();
         return;
     }
@@ -157,6 +169,7 @@ export default class PowerUpManager {
         }
         this.scene.time.delayedCall( 5000, this.respawnPowerUp, [powerUp], this.scene.powerUpsManager);
         this.scene.soundEffects['powerUp'].play();
+        this.scene.lights.removeLight(powerUp.light);
         powerUp.particles.stop();
         powerUp.particles.destroy();
         powerUp.destroy();

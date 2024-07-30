@@ -13,8 +13,8 @@ export default class EndGameScene extends Phaser.Scene {
         this.load.image('buttonPressed', '../Assets/Media/Finished/buttonPressed.png');
 
         //Sounds
-        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/hoverOverButton.wav");
-        this.load.audio("pressButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/pressButton.wav");
+        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/hoverOverButton.wav");
+        this.load.audio("pressButton", "../Assets/Sounds/Effects/pressButton.wav");
     }
 
     create(data) {

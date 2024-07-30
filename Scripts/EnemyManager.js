@@ -78,13 +78,19 @@ export default class EnemyManager {
         }
     
         let enemy = new Enemy(this.scene, x, y, 'enemy');
+        enemy.setPipeline("Light2D");
+        enemy.light = this.scene.lights.addLight(0,0, 75, 0x000000, 1);
+        this.scene.lightManager.changeColor(enemy.light, 0.353, 0.231, 0.172);
         this.addArmorIndicators(this.scene, enemy.armorTypes, enemy);
     }
     
     killEnemy(spell, enemy) {
         let damage = this.calculateDamage(enemy);
         enemy.health -= damage;
-    
+        enemy.setTint(0xff0000);
+        this.scene.time.delayedCall(100, () => {
+            enemy.clearTint();
+        });
         if(enemy.health <= 0) {
             //Remove the armor UI
             if (enemy.armorIndicators) {
@@ -95,6 +101,7 @@ export default class EnemyManager {
             }
             //On death blood particles
             this.bloodParticles(enemy);
+            this.scene.lights.removeLight(enemy.light);
             //Kill the enemy
             enemy.destroy();
 
@@ -107,6 +114,7 @@ export default class EnemyManager {
         //Spell particles
         spell.particles.stop();
         spell.particles.destroy();
+        this.scene.lights.removeLight(spell.light);
         spell.destroy();
     }
     
@@ -134,6 +142,7 @@ export default class EnemyManager {
                 }
             }
             
+            enemy.light.setPosition(enemy.x, enemy.y);
         });
     }
     
@@ -142,7 +151,9 @@ export default class EnemyManager {
         armorTypes.forEach((type, i) => {
             if(!type.image) {
                 type.imagePlaceholder = scene.add.image(0,0,'spell-holder');
+                type.imagePlaceholder.setPipeline("Light2D");
                 type.image = scene.add.image(0,0,type.imageName);
+                type.image.setPipeline("Light2D");
             }
             enemy.armorIndicators.push({image: type.image, imagePlaceholder: type.imagePlaceholder});
         });
@@ -174,7 +185,7 @@ export default class EnemyManager {
         let bloodParticle = this.scene.add.particles(0, 0, 'bloodParticle', {
             speed: 200,
             scale: {start:1, end:0},
-            blendMode: 'MULTIPLY',
+            blendMode: 'NORMAL',
         });
         bloodParticle.explode(30, enemy.x, enemy.y);
     }
