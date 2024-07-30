@@ -6,13 +6,24 @@ export default class EndGameScene extends Phaser.Scene {
     }
 
     preload() {
+        //Images
         this.load.image('EndGameScreen', '../Assets/Media/Finished/EndGameScreen.png');
         this.load.image('buttonNormal', '../Assets/Media/Finished/buttonNormal.png');
         this.load.image('buttonHover', '../Assets/Media/Finished/buttonHover.png');
         this.load.image('buttonPressed', '../Assets/Media/Finished/buttonPressed.png');
+
+        //Sounds
+        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/hoverOverButton.wav");
+        this.load.audio("pressButton", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/pressButton.wav");
     }
 
     create(data) {
+
+        //Sound effects
+        this.soundEffects = [];
+        this.addSound('hoverOverButton', 0.5);
+
+        this.soundEffects['pressButton'] = this.sound.add('pressButton');
 
         //Background
         this.add.image(400,300, 'EndGameScreen');
@@ -45,9 +56,17 @@ export default class EndGameScene extends Phaser.Scene {
         const button = this.add.sprite(x, y, 'buttonNormal')
         .setScale(scale)
         .setInteractive()
-        .on('pointerover', () => button.setTexture('buttonHover'))
+        .on('pointerover', () => {
+                button.setTexture('buttonHover');
+                this.playSound('hoverOverButtonPool');
+            }
+        )
         .on('pointerout', () => button.setTexture('buttonNormal'))
-        .on('pointerdown', () => button.setTexture('buttonPressed'))
+        .on('pointerdown', () => {
+                button.setTexture('buttonPressed');
+                this.soundEffects['pressButton'].play();
+            }
+        )
         .on('pointerup', () => {
             button.setTexture('buttonHover');
             if(callback) {
@@ -56,5 +75,23 @@ export default class EndGameScene extends Phaser.Scene {
         });
         const buttonText = this.add.text(x, y, text, { fontSize: '32px', fill: '#fff' })
             .setOrigin(0.5)
+    }
+
+    addSound(name, volume, poolSize = 10, loopBool = false) {
+        this.soundEffects[name+'Pool'] = [];
+        for(let i = 0; i < poolSize; i++) {
+            let sound = this.sound.add(name, {loop: loopBool});
+            sound.volume = volume;
+            this.soundEffects[name+'Pool'].push(sound);
+        }
+    }
+
+    playSound(poolName) {
+        let soundInstance = this.soundEffects[poolName].find(s => !s.isPlaying);
+        if(!soundInstance) {
+            soundInstance = this.soundEffects[poolName][0];
+            soundInstance.stop();
+        }
+        soundInstance.play();
     }
 }

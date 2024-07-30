@@ -102,7 +102,7 @@ export default class SpellManager {
         spell.particles = this.scene.add.particles(0, 0, 'particle', {
             speed: 50,
             scale: {start:1.5, end:0},
-            blendMode: 'MULTIPLY',
+            blendMode: 'NORMAL',
         });
         spell.particles.startFollow(spell);
     }
