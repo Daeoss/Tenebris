@@ -167,7 +167,7 @@ export default class PowerUpManager {
             default: 
                 break;
         }
-        this.scene.time.delayedCall( 5000, this.respawnPowerUp, [powerUp], this.scene.powerUpsManager);
+        this.scene.time.delayedCall( 20000, this.respawnPowerUp, [powerUp], this.scene.powerUpsManager);
         this.scene.soundEffects['powerUp'].play();
         this.scene.lights.removeLight(powerUp.light);
         powerUp.particles.stop();

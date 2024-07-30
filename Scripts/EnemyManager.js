@@ -87,10 +87,12 @@ export default class EnemyManager {
     killEnemy(spell, enemy) {
         let damage = this.calculateDamage(enemy);
         enemy.health -= damage;
+        //Red tint on hit
         enemy.setTint(0xff0000);
         this.scene.time.delayedCall(100, () => {
             enemy.clearTint();
         });
+        //If dead
         if(enemy.health <= 0) {
             //Remove the armor UI
             if (enemy.armorIndicators) {

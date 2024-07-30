@@ -104,7 +104,7 @@ export function setUpUI(scene) {
         let x = scene.spellHolders[holder].x;
         let y = scene.spellHolders[holder].y;
         var sh = scene.add.image(x, y, 'spell-holder').setScale(2);
-        //sh.setDepth(1);
+        sh.setDepth(1);
         sh.setScrollFactor(0);
     }
 
