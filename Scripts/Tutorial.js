@@ -1,52 +1,26 @@
-export default class StartMenu extends Phaser.Scene {
+export default class Tutorial extends Phaser.Scene {
     constructor() {
-        super({ key: 'StartMenu' });
+        super({ key: 'Tutorial' });
     }
 
     preload() {
         //Images
-        this.load.image('title', '../Assets/Media/Finished/title.png');
-        this.load.image('buttonNormal', '../Assets/Media/Finished/buttonNormal.png');
-        this.load.image('buttonHover', '../Assets/Media/Finished/buttonHover.png');
-        this.load.image('buttonPressed', '../Assets/Media/Finished/buttonPressed.png');
-        this.load.image('sound_on', '../Assets/Media/Finished/sound_on.png');
-        this.load.image('sound_off', '../Assets/Media/Finished/sound_off.png');
-
-        //Sounds
-        this.load.audio("bg-music", "../Assets/Sounds/Music/ThreeRedHearts-DeepBlue.ogg");
-        this.load.audio("hoverOverButton", "../Assets/Sounds/Effects/hoverOverButton.wav");
-        this.load.audio("pressButton", "../Assets/Sounds/Effects/pressButton.wav");
+        this.load.image('tutorial', '../Assets/Media/Finished/tutorial.png');
     }
 
     create() {
-        //Music
-        this.bgMusic = this.sound.add("bg-music", {loop: true});
-        this.bgMusic.volume = 0.025;
-        this.bgMusic.play();
-
         //Sound effects
         this.soundEffects = [];
         this.addSound('hoverOverButton', 0.5);
-
         this.soundEffects['pressButton'] = this.sound.add('pressButton');
 
         //Add background image for menu
-        this.add.image(400,300, 'title');
+        this.add.image(400,300, 'tutorial');
 
-        // Create the 'Play' button
-        this.setUpButton(400,375,'Play', () => {
-            this.startGame();
-        });
-
-        // Create the 'How to play' button
-        this.setUpButton(400,450,'How to play', () => {
-            this.showTutorial();
-        }, {x:4, y:2});
-
-        // Create the 'Quit' button
-        this.setUpButton(400,525,'Quit', () => {
-            this.quitGame();
-        });
+        // Create the 'Return' button
+        this.setUpButton(100,105,'<', () => {
+            this.goBack();
+        }, {x:1, y:1});
 
         //Mute audio
         let isOn = true;
@@ -65,19 +39,9 @@ export default class StartMenu extends Phaser.Scene {
         });
     }
 
-    startGame() {
+    goBack() {
         // Switch to the Game Scene
-        this.scene.start('GameScene', {music: this.bgMusic});
-    }
-
-    showTutorial() {
-        //Switch to the tutorial
-        this.scene.start('Tutorial');
-    }
-
-    quitGame() {
-        // Quit the game (if in a browser, reload or redirect)
-        window.close(); // May not always work in some browsers; consider window.location.href or window.history.back()
+        this.scene.start('StartMenu');
     }
 
     setUpButton(x, y, text, callback, scale = {x:2, y:2}) {

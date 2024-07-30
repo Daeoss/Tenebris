@@ -2,12 +2,13 @@
 import StartMenu from './Scripts/StartMenu.js';
 import GameScene from './Scripts/GameScene.js';
 import EndGameScene from './Scripts/EndGameScene.js';
+import Tutorial from './Scripts/Tutorial.js';
 
 const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [StartMenu, GameScene, EndGameScene],
+    scene: [StartMenu, GameScene, EndGameScene, Tutorial],
     pixelArt: true,
     disableContextMenu: true, //Disable right mouse button menu
     physics: {

@@ -5,6 +5,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         this.body.setSize(this.width*0.5, this.height);
         this.setCollideWorldBounds(true);
+        this.body.setAccelerationY(1000);
         this.speed = 200;
         this.gravity = -360;
         this.isShielded = false;
@@ -38,15 +39,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.anims.play('turn', true);
             }
         }
-        if (cursors.up.isDown && this.body.blocked.down)
+        if ((cursors.up.isDown || cursors.space.isDown) && this.body.blocked.down)
         {
             this.scene.soundEffects['jump'].play();
-            this.setVelocityY(-250);
+            this.setVelocityY(-650);
         }
 
         // Handle down cursor key
-        if (cursors.down.isDown) {
-            this.setVelocityY(400);
+        if (cursors.down.isDown && !this.body.blocked.down) {
+            this.setVelocityY(800);
             this.body.setAllowGravity(false);
             this.setSize(this.width, this.height / 1.5);
             this.canPassThrough = true; 

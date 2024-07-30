@@ -6,6 +6,7 @@ export function setUpKeyboardControls(scene) {
         'down': Phaser.Input.Keyboard.KeyCodes.S,
         'firstSpell': Phaser.Input.Keyboard.KeyCodes.Q,
         'secondSpell': Phaser.Input.Keyboard.KeyCodes.E,
+        'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
     return cursors;
 }
