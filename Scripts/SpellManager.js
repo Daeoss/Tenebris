@@ -64,6 +64,7 @@ export default class SpellManager {
                 spell.image = scene.add.image(0,0,spell.imageName);
                 spell.image.setScrollFactor(0);
                 spell.image.setDepth(1);
+                spell.image.name = spell.imageName;
             }
     
             slot = scene.spellHolders[i];

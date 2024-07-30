@@ -35,7 +35,7 @@ export default class EnemyManager {
         ]
     }
 
-    calculateDamage(enemy) {
+    calculateDamage(enemy, spell) {
         let matches = 0;
         let armorTypesTemp = [...enemy.armorTypes]; //Create a copy of the enemy's armor types
         this.scene.spellsStorage.forEach((spell, i) => { // Loop over the selected spells
@@ -44,7 +44,13 @@ export default class EnemyManager {
     
             if (index !== -1) {
                 matches++;
-                armorTypesTemp.splice(index, 1); // Delete the matched armor type from the temporary array
+                enemy.armorTypes.splice(index, 1); // Delete the matched armor type from the temporary array
+                enemy.armorIndicators.forEach((indicator) => {
+                    if(indicator.image.name == spell.image.name) {
+                        indicator.image.destroy();
+                        indicator.imagePlaceholder.destroy();
+                    }
+                });
             }
         });
         return matches;
@@ -85,7 +91,7 @@ export default class EnemyManager {
     }
     
     killEnemy(spell, enemy) {
-        let damage = this.calculateDamage(enemy);
+        let damage = this.calculateDamage(enemy, spell);
         enemy.health -= damage;
         //Red tint on hit
         enemy.setTint(0xff0000);
@@ -156,6 +162,7 @@ export default class EnemyManager {
                 type.imagePlaceholder.setPipeline("Light2D");
                 type.image = scene.add.image(0,0,type.imageName);
                 type.image.setPipeline("Light2D");
+                type.image.name = type.imageName;
             }
             enemy.armorIndicators.push({image: type.image, imagePlaceholder: type.imagePlaceholder});
         });
