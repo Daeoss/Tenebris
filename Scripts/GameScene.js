@@ -21,13 +21,12 @@ export default class GameScene extends Phaser.Scene
         this.loadImages();
     }
 
-    create ()
+    create (data)
     {
+        // const gameScene = this.scene.get('GameScene');
+        // gameScene.game.sound.mute = true;
         //Music
-        this.bgMusic = this.sound.add("bg-music", {loop: true});
-        this.bgMusic.volume = 0.05;
-        this.bgMusic.play();
-
+        data.music.volume = 0.05;
         //Sound effects
         this.soundEffects['jump'] = this.sound.add("jump");
         this.soundEffects['jump'].volume = 0.5;
@@ -182,7 +181,6 @@ export default class GameScene extends Phaser.Scene
     gameOver(player,enemy) {
         if(!player.isShielded) {
             this.isGameOver = true;
-            this.bgMusic.stop();
             if(this.score > this.highscore) {
                 this.highscore = this.score;
             }
@@ -293,12 +291,10 @@ export default class GameScene extends Phaser.Scene
         this.load.image("tiles", "Assets/Media/Finished/tileset.png");
         this.load.tilemapTiledJSON("map", "Assets/Tiles/mainTileset.json");
         //Sound
-        this.load.audio("bg-music", "../Assets/Sounds/Music/ThreeRedHearts-DeepBlue.ogg");
         this.load.audio("selectSpell", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/selectSpell.wav");
         this.load.audio("attack", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/attack.wav");
         this.load.audio("enemyDeath", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/enemyDeath.wav");
         this.load.audio("jump", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/jump.wav");
-        this.load.audio("walk", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/walk.wav");
         this.load.audio("powerUp", "../Assets/Sounds/Effects/FilmCow Recorded SFX/Used/powerUp.wav");
     }
 }
