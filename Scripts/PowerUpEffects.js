@@ -19,10 +19,12 @@ export class IncreasedFireRate {
 
     activate() {
         this.spellManager.setFireRate(100);
+        this.spellManager.increasedFireRate = true;
     }
 
     deactivate() {
         this.spellManager.setFireRate(500);
+        this.spellManager.increasedFireRate = false;
     }
 }
 
