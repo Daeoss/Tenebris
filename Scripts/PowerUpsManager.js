@@ -131,8 +131,8 @@ export default class PowerUpManager {
     }
 
     addBonus(player, bonus) {
-        this.score+=500;
-        this.scoreText.setText('Score: ' + this.score);
+        this.starScore+=1;
+        this.starText.setText('x' + this.starScore);
         bonus.destroy();
         return;
     }
