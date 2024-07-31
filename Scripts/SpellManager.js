@@ -110,9 +110,13 @@ export default class SpellManager {
 
     addParticles(spell) {
         spell.particles = this.scene.add.particles(0, 0, 'particle', {
-            speed: 50,
-            scale: {start:1.5, end:0},
+            angle: {min: 0, max: -180},
+            speed: 100,
+            quantity: 1,
+            scale: { start: 2, end: 0 },
+            lifespan: 600,
             blendMode: 'NORMAL',
+            // frequency: 100,
         });
         spell.particles.startFollow(spell);
         spell.particles.setPipeline("Light2D");

@@ -46,14 +46,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Handle down cursor key
-        if (cursors.down.isDown && !this.body.blocked.down) {
-            this.setVelocityY(800);
+        if (cursors.down.isDown) {
             this.body.setAllowGravity(false);
-            this.setSize(this.width, this.height / 1.5);
             this.canPassThrough = true; 
         } else {
             this.body.setAllowGravity(true);
-            this.setSize(this.width, this.height);
             this.canPassThrough = false;
         }
 

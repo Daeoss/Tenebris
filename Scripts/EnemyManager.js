@@ -8,7 +8,7 @@ export default class EnemyManager {
                 title:'wave1',
                 time: 100,
                 enemies: [
-                    { type: 'flying', count:100, interval: 1250 }
+                    { type: 'flying', count:100, interval: 1500 }
                 ],
             },
             {

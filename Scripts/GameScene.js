@@ -274,13 +274,8 @@ export default class GameScene extends Phaser.Scene
 
     loadImages() {
         //Images
-        this.load.image('sky', 'Assets/Media/Finished/sky.png');
         this.load.image('behind', 'Assets/Media/Finished/behind.png');
         this.load.image('ground', 'Assets/Media/Finished/platform.png');
-        this.load.image('star', 'Assets/Media/Finished/star.png');
-        this.load.image('bomb', 'Assets/Media/Finished/bomb.png');
-        this.load.image('shadow', 'Assets/Media/Finished/Shadow.png');
-        this.load.image('flying-shadow', 'Assets/Media/Finished/FlyingShadow.png');
         this.load.image('wand', 'Assets/Media/Finished/wand.png');
         this.load.image('fire', 'Assets/Media/Finished/fire.png');
         this.load.image('rune_n', 'Assets/Media/Finished/rune_n.png');
