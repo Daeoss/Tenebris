@@ -8,28 +8,28 @@ export default class EnemyManager {
                 title:'wave1',
                 time: 100,
                 enemies: [
-                    { type: 'flying', count:100, interval: 1250 }
+                    { type: 'flying', count:100, interval: 2500 }
                 ],
             },
             {
                 title:'wave2', 
-                time: 5000,
+                time: 250000,
                 enemies: [
-                    { type: 'flying', count:1, interval: 1000 }
+                    { type: 'flying', count:500, interval: 2250 }
                 ],
             },
             {
                 title:'wave3', 
-                time: 25000,
+                time: 1125000,
                 enemies: [
-                    {  type: 'flying', count:1, interval: 500 }
+                    {  type: 'flying', count:1000, interval: 2000 }
                 ],
             },
             {
-                title:'wave4', 
-                time: 50000,
+                title:'wave4',
+                time: 2000000,
                 enemies: [
-                    {  type: 'flying', count:1, interval: 2000 }
+                    {  type: 'flying', count:1000000, interval: 1750 }
                 ],
             },
         ]

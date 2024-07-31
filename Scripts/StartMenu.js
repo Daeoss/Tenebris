@@ -20,10 +20,12 @@ export default class StartMenu extends Phaser.Scene {
 
     create() {
         //Music
-        this.bgMusic = this.sound.add("bg-music", {loop: true});
-        this.bgMusic.volume = 0.025;
-        this.bgMusic.play();
-
+        if(!this.bgMusic) {
+            this.bgMusic = this.sound.add("bg-music", {loop: true});
+            this.bgMusic.volume = 0.025;
+            this.bgMusic.play();   
+        }
+        
         //Sound effects
         this.soundEffects = [];
         this.addSound('hoverOverButton', 0.5);
